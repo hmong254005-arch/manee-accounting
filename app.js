@@ -134,10 +134,23 @@ function setupNavigation() {
     const views = document.querySelectorAll('.view-section');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
     if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('open');
+                if(overlay) overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
         });
     }
 
@@ -153,14 +166,6 @@ function setupNavigation() {
             views.forEach(view => view.classList.remove('active'));
             document.getElementById(`view-${tab}`).classList.add('active');
 
-            // Remove padding if chat view to allow full-screen chat
-            const mainContent = document.querySelector('.main-content');
-            if (tab === 'chat') {
-                mainContent.classList.add('no-padding');
-            } else {
-                mainContent.classList.remove('no-padding');
-            }
-
             // Refresh data if needed
             if (tab === 'dashboard') {
                 updateDashboard();
@@ -168,9 +173,23 @@ function setupNavigation() {
                 renderTransactionsTable();
             }
             
+            // Change mobile page title
+            const titleMap = {
+                'dashboard': 'หน้าแรก',
+                'chat': 'คุยกับมานี',
+                'transactions': 'ประวัติ',
+                'pos': 'POS',
+                'products': 'สินค้า'
+            };
+            const titleEl = document.getElementById('mobile-page-title');
+            if (titleEl && titleMap[tab]) {
+                titleEl.textContent = titleMap[tab];
+            }
+            
             // Auto close sidebar on mobile when navigating
             if (window.innerWidth <= 768) {
-                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('open');
+                if(overlay) overlay.classList.remove('active');
             }
         });
     });
@@ -315,7 +334,10 @@ function setupChat() {
         });
     }
 
-    const sendBtn = document.getElementById('send-btn');
+    const sendBtn = document.getElementById('gemini-primary-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const iconWave = document.getElementById('icon-wave');
+    const iconSend = document.getElementById('icon-send');
     const input = document.getElementById('chat-input');
     const attachBtn = document.getElementById('attach-btn');
     const fileInput = document.getElementById('chat-image-upload');
@@ -323,7 +345,21 @@ function setupChat() {
     const previewImg = document.getElementById('chat-image-preview');
     const removeImgBtn = document.getElementById('remove-image-btn');
 
-    sendBtn.addEventListener('click', handleSendMessage);
+    if (sendBtn) {
+        sendBtn.addEventListener('click', () => {
+            if (input.value.trim().length > 0 || currentChatImageBase64) {
+                handleSendMessage();
+            } else {
+                showToast("ฟีเจอร์สั่งงานด้วยเสียง (Voice) กำลังพัฒนา 🎙️");
+            }
+        });
+    }
+    
+    if (micBtn) {
+        micBtn.addEventListener('click', () => {
+            showToast("ฟีเจอร์สั่งงานด้วยเสียง (Voice) กำลังพัฒนา 🎙️");
+        });
+    }
     
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -338,6 +374,19 @@ function setupChat() {
     input.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
+        
+        // Gemini style button toggle
+        if (sendBtn && iconWave && iconSend) {
+            if (this.value.trim().length > 0) {
+                sendBtn.classList.add('typing');
+                iconWave.style.display = 'none';
+                iconSend.style.display = 'block';
+            } else {
+                sendBtn.classList.remove('typing');
+                iconWave.style.display = 'block';
+                iconSend.style.display = 'none';
+            }
+        }
     });
 
     attachBtn.addEventListener('click', () => fileInput.click());
@@ -383,6 +432,14 @@ async function handleSendMessage() {
     // Clear inputs
     input.value = '';
     input.style.height = 'auto';
+    
+    // Reset Gemini button state
+    const pBtn = document.getElementById('gemini-primary-btn');
+    if (pBtn) {
+        pBtn.classList.remove('typing');
+        document.getElementById('icon-wave').style.display = 'block';
+        document.getElementById('icon-send').style.display = 'none';
+    }
     const previewContainer = document.getElementById('chat-image-preview-container');
     previewContainer.style.display = 'none';
     const b64 = currentChatImageBase64;
