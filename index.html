@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>มานี บัญชี (Manee Accounting)</title>
+    <meta name="description" content="แอปพลิเคชัน AI ผู้ช่วยจดบัญชีสำหรับร้านค้าและครัวเรือน">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <!-- Markdown Parser (for AI responses) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3B82F6">
+    <link rel="apple-touch-icon" href="icon-512.jpg">
+</head>
+<body>
+    <!-- Auth / Login Modal -->
+    <div id="auth-modal" class="modal" style="display: flex; background: rgba(0,0,0,0.8);">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 20px;">
+            <div style="margin-bottom: 24px;">
+                <h2 style="font-size: 24px; color: var(--primary-color);">มานี บัญชี</h2>
+                <p style="color: var(--text-secondary); margin-top: 8px;">ยินดีต้อนรับ! เข้าสู่ระบบเพื่อแยกข้อมูลร้านค้า</p>
+            </div>
+            
+            <!-- Email Login Form -->
+            <div id="email-auth-form" class="form-group" style="text-align: left; display: none;">
+                <label for="auth-email">อีเมล</label>
+                <input type="email" id="auth-email" placeholder="example@email.com" style="margin-bottom: 12px;">
+                
+                <label for="auth-password">รหัสผ่าน</label>
+                <input type="password" id="auth-password" placeholder="ตั้งรหัสผ่าน 6 ตัวขึ้นไป" style="margin-bottom: 20px;">
+                
+                <button id="btn-login-submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">เข้าสู่ระบบ / สมัครสมาชิก</button>
+                <button id="btn-back-to-options" class="btn" style="width: 100%; background: #f3f4f6; color: #374151;">ย้อนกลับ</button>
+            </div>
+
+            <!-- Login Options -->
+            <div id="auth-options">
+                <button id="btn-show-email-login" class="btn btn-primary" style="width: 100%; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    สมัคร / เข้าสู่ระบบด้วยอีเมล
+                </button>
+                
+                <div style="position: relative; margin: 24px 0;">
+                    <hr style="border-top: 1px solid var(--border-color);">
+                    <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: var(--text-secondary); font-size: 14px;">หรือ</span>
+                </div>
+
+                <button id="btn-guest-login" class="btn" style="width: 100%; background-color: #10B981; color: white; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    เข้าใช้งานทันที (ไม่สมัคร)
+                </button>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">*เหมาะสำหรับทดลองใช้งาน ข้อมูลจะผูกกับเครื่องนี้เท่านั้น</p>
+            </div>
+            
+            <!-- Auth Loading State -->
+            <div id="auth-loading" style="display: none; padding: 20px 0;">
+                <div class="loading-spinner" style="margin: 0 auto; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: var(--text-secondary);">กำลังดำเนินการ...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal-btn" id="close-modal-btn">&times;</button>
+            <h2 style="margin-bottom: 20px;">ตั้งค่าระบบ</h2>
+            <div class="form-group">
+                <label for="gemini-api-key">Gemini API Key</label>
+                <input type="password" id="gemini-api-key" placeholder="ใส่ API Key ของคุณที่นี่">
+                <small>API Key ของคุณจะถูกเก็บไว้อย่างปลอดภัยในเบราว์เซอร์ของคุณเท่านั้น</small>
+            </div>
+            <button id="save-settings-btn" class="btn btn-primary" style="margin-bottom: 24px;">บันทึก API Key</button>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
+            
+            <h3 style="margin-bottom: 16px; font-size: 16px;">บัญชีผู้ใช้ (Account)</h3>
+            <button id="btn-logout" class="btn" style="width: 100%; margin-bottom: 24px; background-color: #fee2e2; color: #b91c1c;">
+                ออกจากระบบ (Logout)
+            </button>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
+            
+            <h3 style="margin-bottom: 16px; font-size: 16px;">สำรองและกู้คืนข้อมูล (Backup & Restore)</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">ข้อมูลทั้งหมดถูกบันทึกไว้ในเบราว์เซอร์นี้ หากต้องการย้ายเครื่องหรือสำรองข้อมูล กรุณาดาวน์โหลดไฟล์เก็บไว้</p>
+            <div style="display: flex; gap: 10px;">
+                <button id="export-data-btn" class="btn" style="flex: 1; background-color: var(--success-color); color: white;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    สำรองข้อมูล (Export)
+                </button>
+                <button id="import-data-btn" class="btn" style="flex: 1; background-color: var(--warning-color); color: white;" onclick="document.getElementById('import-file-input').click()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    กู้คืนข้อมูล (Import)
+                </button>
+                <input type="file" id="import-file-input" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">M</div>
+                <h1>มานี บัญชี</h1>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item" data-tab="chat">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    คุยกับมานี (Chat)
+                </button>
+                <button class="nav-item active" data-tab="dashboard">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    ภาพรวม (Dashboard)
+                </button>
+                <button class="nav-item" data-tab="transactions">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    รายการทั้งหมด
+                </button>
+                <button class="nav-item" data-tab="calendar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    ปฏิทินยอดขาย
+                </button>
+                <button class="nav-item" data-tab="pos">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                    หน้าร้าน (POS)
+                </button>
+                <button class="nav-item" data-tab="manage-menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    จัดการเมนู
+                </button>
+            </nav>
+            <div class="sidebar-bottom">
+                <button id="open-settings-btn" class="nav-item">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    ตั้งค่า API
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <div class="mobile-header">
+                <button id="sidebar-toggle" class="btn-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view-section active">
+                <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2>ภาพรวมการเงิน (Dashboard)</h2>
+                        <p class="subtitle">สรุปรายรับ-รายจ่ายของคุณ</p>
+                    </div>
+                    <select id="dashboard-period-select" class="btn" style="background-color: white; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; cursor: pointer; border-radius: 8px;">
+                        <option value="daily">รายวัน (ล่าสุด)</option>
+                        <option value="weekly">รายสัปดาห์</option>
+                        <option value="monthly">รายเดือน</option>
+                        <option value="yearly">รายปี</option>
+                        <option value="all">ทั้งหมด</option>
+                    </select>
+                </header>
+                
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>กำไรสุทธิ (ร้านค้า)</h3>
+                        <p class="amount profit" id="summary-store-profit">฿0</p>
+                    </div>
+                    <div class="card">
+                        <h3>รายจ่าย (ร้านค้า)</h3>
+                        <p class="amount expense" id="summary-store-expense">฿0</p>
+                    </div>
+                    <div class="card">
+                        <h3>รายจ่าย (ครัวเรือน)</h3>
+                        <p class="amount expense" id="summary-house-expense">฿0</p>
+                    </div>
+                    <div class="card">
+                        <h3>รายรับรวมทั้งหมด</h3>
+                        <p class="amount income" id="summary-total-income">฿0</p>
+                    </div>
+                    <div class="card" style="background-color: var(--primary-color); color: white;">
+                        <h3 style="color: rgba(255,255,255,0.9);">เงินคงเหลือสุทธิ</h3>
+                        <p class="amount" id="summary-net-balance" style="color: white; font-size: 32px;">฿0</p>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>สัดส่วนบัญชีร้านค้า vs ครัวเรือน</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-insight-box">
+                        <div class="insight-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                            <h3>คำแนะนำจากมานี</h3>
+                            <button id="refresh-insight-btn" class="btn-icon" title="วิเคราะห์ใหม่">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            </button>
+                        </div>
+                        <div class="insight-content" id="insight-content">
+                            <p class="insight-placeholder">กำลังรอการวิเคราะห์ข้อมูล...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-sellers-container">
+                    <h3>ยอดฮิตประจำร้าน (Best Sellers)</h3>
+                    <div class="best-sellers-list" id="best-sellers-list">
+                        <!-- Best sellers populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat View -->
+            <section id="view-chat" class="view-section">
+                <header class="view-header">
+                    <h2>คุยกับมานี</h2>
+                    <p class="subtitle">พิมพ์สั่งงานได้เลย เช่น "วันนี้ขายของได้ 1500 จ่ายค่าข้าว 200"</p>
+                </header>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai">
+                            <div class="message-content">
+                                สวัสดีค่ะ เถ้าแก่! วันนี้มีอะไรให้มานีช่วยจดบัญชี หรืออยากสอบถามยอดขาย พิมพ์บอกมานีได้เลยนะคะ 😊 (อย่าลืมตั้งค่า API Key ก่อนนะ)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area-wrapper" style="display: flex; flex-direction: column; background: white; border-top: 1px solid var(--border-color);">
+                        <div class="chat-quick-prompts" id="chat-quick-prompts" style="display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid var(--border-color); background: #f8fafc;">
+                            <button class="quick-prompt-btn" onclick="document.getElementById('chat-input').value = 'มีอะไรต้องปรับปรุงไหม'; document.getElementById('send-btn').click();">มีอะไรต้องปรับปรุงไหม 💡</button>
+                            <button class="quick-prompt-btn" onclick="document.getElementById('chat-input').value = 'สรุปยอดขายวันนี้ให้หน่อย'; document.getElementById('send-btn').click();">สรุปยอดวันนี้ให้หน่อย</button>
+                            <button class="quick-prompt-btn" onclick="document.getElementById('chat-input').value = 'กำไรวันนี้เท่าไหร่'; document.getElementById('send-btn').click();">กำไรวันนี้เท่าไหร่</button>
+                            <button class="quick-prompt-btn" onclick="document.getElementById('chat-input').value = 'มีรายจ่ายอะไรบ้างวันนี้'; document.getElementById('send-btn').click();">มีรายจ่ายอะไรบ้างวันนี้</button>
+                            <button class="quick-prompt-btn" onclick="document.getElementById('chat-input').value = 'สรุปยอดเมื่อวานให้หน่อย'; document.getElementById('send-btn').click();">สรุปยอดเมื่อวาน</button>
+                        </div>
+                        <div id="chat-image-preview-container" style="display: none; padding: 10px 16px 0 16px; position: relative;">
+                            <img id="chat-image-preview" src="" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <button id="remove-image-btn" style="position: absolute; top: 5px; left: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+                        </div>
+                        <div class="chat-input-area" style="border-top: none;">
+                            <input type="file" id="chat-image-upload" accept="image/*" style="display: none;">
+                            <button id="attach-btn" title="แนบรูปภาพใบเสร็จ" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 8px; border-radius: 8px;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                            </button>
+                            <textarea id="chat-input" placeholder="พิมพ์สั่งงาน (พิมพ์หลายบรรทัดได้) หรือแนบรูป..." rows="1" style="resize: none; overflow-y: hidden; min-height: 44px; max-height: 120px;"></textarea>
+                            <button id="send-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transactions View -->
+            <section id="view-transactions" class="view-section">
+                <header class="view-header">
+                    <h2>รายการทั้งหมด</h2>
+                    <p class="subtitle">ประวัติรายรับและรายจ่ายที่คุณบันทึกไว้</p>
+                </header>
+                
+                <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end;">
+                    <div class="tx-filter-group">
+                        <span style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; display: block;">วันที่</span>
+                        <input type="date" id="filter-date" class="btn" style="background-color: white; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; cursor: pointer; height: 38px;">
+                    </div>
+                    
+                    <div class="tx-filter-group">
+                        <span style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; display: block;">หมวดหมู่ (บัญชี)</span>
+                        <div class="tx-filter-tabs" id="filter-category">
+                            <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
+                            <button class="tx-filter-btn" data-filter="store">ร้านค้า</button>
+                            <button class="tx-filter-btn" data-filter="house">ครัวเรือน</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tx-filter-group">
+                        <span style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; display: block;">ประเภทรายการ</span>
+                        <div class="tx-filter-tabs" id="filter-type">
+                            <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
+                            <button class="tx-filter-btn" data-filter="income">รายรับ</button>
+                            <button class="tx-filter-btn" data-filter="expense">รายจ่าย</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time summary -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div style="background: white; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; flex: 1; min-width: 150px; text-align: center;">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">รายรับตามตัวกรอง</div>
+                        <div id="tx-summary-income" style="font-size: 20px; font-weight: 600; color: var(--profit-color);">฿0</div>
+                    </div>
+                    <div style="background: white; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; flex: 1; min-width: 150px; text-align: center;">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">รายจ่ายตามตัวกรอง</div>
+                        <div id="tx-summary-expense" style="font-size: 20px; font-weight: 600; color: var(--danger-color);">฿0</div>
+                    </div>
+                    <div style="background: white; border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; flex: 1; min-width: 150px; text-align: center;">
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 5px;">ยอดสุทธิตามตัวกรอง</div>
+                        <div id="tx-summary-net" style="font-size: 20px; font-weight: 600; color: var(--text-primary);">฿0</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="transactions-table">
+                        <thead>
+                            <tr>
+                                <th class="col-date">วันที่-เวลา</th>
+                                <th class="col-category">หมวดหมู่ (ร้าน/บ้าน)</th>
+                                <th class="col-type">ประเภท</th>
+                                <th class="col-detail">รายละเอียด</th>
+                                <th class="col-amount">จำนวนเงิน</th>
+                                <th class="col-action">ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody">
+                            <!-- Rows will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- POS View -->
+            <section id="view-pos" class="view-section">
+                <header class="view-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2>หน้าร้าน (POS)</h2>
+                        <p class="subtitle">กดปุ่มเพื่อบันทึกยอดขายอย่างรวดเร็ว</p>
+                    </div>
+                    <button id="close-shop-btn" class="btn" style="background-color: var(--primary-color); color: white;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        สรุปยอดปิดร้าน
+                    </button>
+                </header>
+                
+                <div class="pos-layout">
+                    <div class="pos-main">
+                        <div class="pos-grid" id="pos-grid">
+                            <!-- Product buttons generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="pos-sidebar">
+                        <div class="pos-stats-card">
+                            <h3 style="margin-top: 0; margin-bottom: 4px; font-size: 16px;">สถิติยอดขายวันนี้</h3>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; margin-top: 0;">(เฉพาะของร้านค้าประจำวัน)</p>
+                            <div class="pos-stats-list" id="pos-stats-list">
+                                <!-- Today stats populated here -->
+                            </div>
+                            <div class="pos-stats-total">
+                                <span>รวมยอดขายวันนี้</span>
+                                <span id="pos-today-total" style="color: var(--profit-color); font-weight: bold; font-size: 20px;">฿0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar View -->
+            <section id="view-calendar" class="view-section">
+                <header class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2>ปฏิทินยอดขาย</h2>
+                        <p class="subtitle">ดูสรุปยอดขายตามวันในปฏิทิน</p>
+                    </div>
+                    <div class="calendar-controls" style="display: flex; align-items: center; gap: 15px;">
+                        <button id="cal-prev-month" class="btn btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                        <h3 id="cal-current-month" style="margin: 0; min-width: 150px; text-align: center;">-</h3>
+                        <button id="cal-next-month" class="btn btn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+                    </div>
+                </header>
+                <div class="calendar-container">
+                    <div class="calendar-header-row">
+                        <div>อา.</div><div>จ.</div><div>อ.</div><div>พ.</div><div>พฤ.</div><div>ศ.</div><div>ส.</div>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid">
+                        <!-- Calendar days populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Menu View -->
+            <section id="view-manage-menu" class="view-section">
+                <header class="view-header">
+                    <h2>จัดการเมนู</h2>
+                    <p class="subtitle">เพิ่ม ลบ หรือแก้ไขเมนูสินค้า</p>
+                </header>
+                
+                <div class="add-product-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                    <input type="text" id="new-product-name" placeholder="ชื่อเมนู (เช่น ลาเต้เย็น)" required style="grid-column: span 2;">
+                    <input type="number" id="new-product-price" placeholder="ราคา (บาท)" required>
+                    <select id="new-product-category">
+                        <option value="กาแฟ">กาแฟ</option>
+                        <option value="ชา">ชา</option>
+                        <option value="นม/โกโก้">นม/โกโก้</option>
+                        <option value="อิตาเลียนโซดา">อิตาเลียนโซดา</option>
+                        <option value="ขนม/เบเกอรี่">ขนม/เบเกอรี่</option>
+                        <option value="อื่นๆ">อื่นๆ</option>
+                    </select>
+                    <select id="new-product-color">
+                        <option value="var(--primary-color)">สีน้ำเงิน</option>
+                        <option value="var(--success-color)">สีเขียว</option>
+                        <option value="var(--warning-color)">สีส้ม</option>
+                        <option value="var(--danger-color)">สีแดง</option>
+                        <option value="#9c27b0">สีม่วง</option>
+                        <option value="#795548">สีน้ำตาล</option>
+                    </select>
+                    <button id="add-product-btn" class="btn btn-primary" style="grid-column: span 2;">เพิ่มเมนู</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>สี</th>
+                                <th>ชื่อเมนู</th>
+                                <th>หมวดหมู่</th>
+                                <th>ราคา</th>
+                                <th style="text-align: right;">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <!-- Product rows populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Daily Summary Modal -->
+    <div id="daily-summary-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 style="margin: 0; font-size: 20px;">สรุปยอดขายประจำวัน (ปิดร้าน)</h3>
+                <button class="close-btn" id="close-daily-summary-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                <div class="daily-stats-summary" id="daily-stats-summary" style="margin-bottom: 24px;">
+                    <!-- Basic stats generated here -->
+                </div>
+                
+                <div class="ai-insight-box">
+                    <div class="insight-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+                        <h3>AI วิเคราะห์และเสนอแนะแนวทางพัฒนา</h3>
+                    </div>
+                    <div class="insight-content" id="daily-ai-insight">
+                        <p class="insight-placeholder"><span class="loading-dots">กำลังส่งข้อมูลยอดขายวันนี้ให้มานีวิเคราะห์</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Detail Modal -->
+    <div id="calendar-detail-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="calendar-detail-title" style="margin: 0; font-size: 20px;">ยอดประจำวันที่ ...</h3>
+                <button class="close-btn" id="close-calendar-detail-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                <div class="daily-stats-summary" id="calendar-detail-summary" style="margin-bottom: 24px;">
+                    <!-- Stats generated here -->
+                </div>
+                <h4>รายการบัญชีในวันนี้</h4>
+                <div class="table-container" style="margin-top: 10px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>เวลา</th>
+                                <th>รายการ</th>
+                                <th>ประเภท</th>
+                                <th>จำนวนเงิน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendar-detail-tbody">
+                            <!-- Transactions here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="db.js"></script>
+    <script src="ai.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

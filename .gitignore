@@ -1,0 +1,7 @@
+cloudflared.exe
+*.log
+*.txt
+serve.ps1
+server.ps1
+tunnel.ps1
+backend/node_modules/

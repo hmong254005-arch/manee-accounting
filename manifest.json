@@ -1,0 +1,21 @@
+{
+  "name": "มานี บัญชี",
+  "short_name": "มานี บัญชี",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#3B82F6",
+  "description": "แอปผู้ช่วยทำบัญชีอัจฉริยะ ใช้งานง่ายด้วย AI",
+  "icons": [
+    {
+      "src": "icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "icon-512.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}

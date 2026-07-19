@@ -1,0 +1,31 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "สวัสดีครับ มีอะไรให้ผมช่วยวันนี้ไหมครับ?",
+            "thoughtSignature": "EjQKMgERTTIP21xr1tYnn+24IQ7UqC4yVtcyl7OWzp13Y5BZaXfLrtPoKFsh4AwvPA56/G7s"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 1,
+    "candidatesTokenCount": 11,
+    "totalTokenCount": 12,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 1
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "modelVersion": "gemini-3.1-flash-lite",
+  "responseId": "DFlWatqfAuurjuMP4uO8uA8"
+}
