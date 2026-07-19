@@ -1271,3 +1271,17 @@ tr:last-child td {
     }
 }
 
+
+@media (max-width: 768px) {
+    .main-content { overflow-x: hidden !important; }
+    .tx-filter-tabs { flex-wrap: wrap !important; gap: 8px !important; }
+    .tx-filter-btn { padding: 6px 12px !important; font-size: 13px !important; min-height: 38px !important; flex: 1; text-align: center; }
+    .tx-filter-group { flex: 1 1 100%; margin-bottom: 5px; }
+    #view-transactions > div:nth-child(2) { gap: 10px !important; } /* The filter container */
+    #filter-date { width: 100% !important; max-width: 100% !important; }
+    /* Summary cards on transactions view */
+    #view-transactions > div:nth-child(3) { gap: 8px !important; display: grid !important; grid-template-columns: 1fr 1fr; }
+    #view-transactions > div:nth-child(3) > div { min-width: 0 !important; padding: 10px !important; }
+    #tx-summary-income, #tx-summary-expense, #tx-summary-net { font-size: 16px !important; }
+}
+
