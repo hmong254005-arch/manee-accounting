@@ -1260,6 +1260,9 @@ tr:last-child td {
     .main-content {
         padding-bottom: 0 !important;
     }
+    .mobile-header {
+        display: flex !important;
+    }
     .mobile-header h2 {
         display: block !important;
     }
