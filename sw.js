@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manee-cache-v7';
+const CACHE_NAME = 'manee-cache-v8';
 const urlsToCache = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ self.addEventListener('install', event => {
       .then(cache => {
         return cache.addAll(urlsToCache);
       })
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -58,7 +59,7 @@ self.addEventListener('activate', event => {
             return caches.delete(cacheName);
           }
         })
-      );
+      ).then(() => self.clients.claim());
     })
   );
 });
