@@ -904,7 +904,10 @@ function renderManageMenuTable() {
                 <td>${p.name}</td>
                 <td class="hide-on-mobile"><span class="badge" style="background-color:#E2E8F0;color:#1E293B;">${cat}</span></td>
                 <td>฿${p.price.toLocaleString()}</td>
-                <td style="text-align: right;">
+                <td style="text-align: right; white-space: nowrap;">
+                    <button class="btn btn-icon" onclick="editProduct('${p.id}')" style="margin-right: 5px; color: var(--primary-color);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
                     <button class="delete-btn" onclick="deleteProduct('${p.id}')">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
@@ -948,7 +951,53 @@ window.deleteProduct = async function(id) {
         await loadProducts();
         showToast("ลบเมนูเรียบร้อยแล้ว");
     }
-};
+}
+
+window.editProduct = function(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    
+    document.getElementById('edit-product-id').value = product.id;
+    document.getElementById('edit-product-name').value = product.name;
+    document.getElementById('edit-product-price').value = product.price;
+    document.getElementById('edit-product-category').value = product.category || 'กาแฟ';
+    document.getElementById('edit-product-color').value = product.color;
+    
+    document.getElementById('edit-product-modal').classList.add('active');
+}
+
+// Edit Product Modal events
+document.addEventListener('DOMContentLoaded', () => {
+    const saveBtn = document.getElementById('save-edit-product-btn');
+    const cancelBtn = document.getElementById('cancel-edit-product-btn');
+    const modal = document.getElementById('edit-product-modal');
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+            const id = document.getElementById('edit-product-id').value;
+            const name = document.getElementById('edit-product-name').value.trim();
+            const price = Number(document.getElementById('edit-product-price').value);
+            const category = document.getElementById('edit-product-category').value;
+            const color = document.getElementById('edit-product-color').value;
+            
+            if (!name || isNaN(price) || price < 0) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
+                return;
+            }
+            
+            await window.dbAPI.updateProduct({ id, name, price, category, color });
+            modal.classList.remove('active');
+            await loadProducts();
+            showToast("แก้ไขเมนูเรียบร้อยแล้ว");
+        });
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+});;
 
 function guessCategory(name) {
     if (!name) return 'ทั่วไป';
