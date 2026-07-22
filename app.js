@@ -858,10 +858,19 @@ function setupProducts() {
 
 async function loadProducts() {
     products = await window.dbAPI.getProducts();
+    
+    // Load sort order from localStorage
+    const savedOrder = JSON.parse(localStorage.getItem('menuSortOrder') || '{}');
+    
+    // Apply order
+    products.forEach(p => {
+        p.sort_order = savedOrder[p.id] !== undefined ? savedOrder[p.id] : 999;
+    });
+
     // Sort products by order (ascending), then by name
     products.sort((a, b) => {
-        const orderA = a.sort_order !== undefined ? a.sort_order : 999;
-        const orderB = b.sort_order !== undefined ? b.sort_order : 999;
+        const orderA = a.sort_order;
+        const orderB = b.sort_order;
         if (orderA !== orderB) return orderA - orderB;
         return (a.name || '').localeCompare(b.name || '');
     });
@@ -960,14 +969,19 @@ function renderManageMenuTable() {
                 onEnd: async function(evt) {
                     const tbody = evt.to;
                     const rows = tbody.querySelectorAll('.menu-item-row');
-                    const updates = [];
+                    
+                    const savedOrder = JSON.parse(localStorage.getItem('menuSortOrder') || '{}');
+                    
                     for (let i = 0; i < rows.length; i++) {
                         const id = rows[i].dataset.id;
+                        savedOrder[id] = i + 1;
+                        
                         const p = products.find(prod => prod.id === id);
                         if (p) p.sort_order = i + 1;
-                        updates.push(window.dbAPI.updateProduct({ id: id, sort_order: i + 1 }));
                     }
-                    await Promise.all(updates);
+                    
+                    // Save to local storage since we can't alter DB schema directly
+                    localStorage.setItem('menuSortOrder', JSON.stringify(savedOrder));
                     
                     products.sort((a, b) => {
                         const orderA = a.sort_order !== undefined ? a.sort_order : 999;
