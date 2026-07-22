@@ -836,19 +836,19 @@ function setupProducts() {
             const category = categorySelect ? categorySelect.value : 'ทั่วไป';
             const color = colorSelect.value;
             const orderInput = document.getElementById('new-product-order');
-            const order = orderInput ? parseInt(orderInput.value) || 0 : 0;
+            const sort_order = orderInput ? parseInt(orderInput.value) || 0 : 0;
 
             if (!name || isNaN(price) || price < 0) {
                 showToast("กรุณากรอกชื่อและราคาให้ถูกต้อง", "error");
                 return;
             }
 
-            const newProduct = { name, price, category, color, order };
+            const newProduct = { name, price, category, color, sort_order };
             await window.dbAPI.addProduct(newProduct);
             
             nameInput.value = '';
             priceInput.value = '';
-            if (orderInput) orderInput.value = (order + 1).toString();
+            if (orderInput) orderInput.value = (sort_order + 1).toString();
             showToast("เพิ่มเมนูเรียบร้อยแล้ว");
             
             await loadProducts();
@@ -860,8 +860,8 @@ async function loadProducts() {
     products = await window.dbAPI.getProducts();
     // Sort products by order (ascending), then by name
     products.sort((a, b) => {
-        const orderA = a.order !== undefined ? a.order : 999;
-        const orderB = b.order !== undefined ? b.order : 999;
+        const orderA = a.sort_order !== undefined ? a.sort_order : 999;
+        const orderB = b.sort_order !== undefined ? b.sort_order : 999;
         if (orderA !== orderB) return orderA - orderB;
         return (a.name || '').localeCompare(b.name || '');
     });
@@ -964,14 +964,14 @@ function renderManageMenuTable() {
                     for (let i = 0; i < rows.length; i++) {
                         const id = rows[i].dataset.id;
                         const p = products.find(prod => prod.id === id);
-                        if (p) p.order = i + 1;
-                        updates.push(window.dbAPI.updateProduct({ id: id, order: i + 1 }));
+                        if (p) p.sort_order = i + 1;
+                        updates.push(window.dbAPI.updateProduct({ id: id, sort_order: i + 1 }));
                     }
                     await Promise.all(updates);
                     
                     products.sort((a, b) => {
-                        const orderA = a.order !== undefined ? a.order : 999;
-                        const orderB = b.order !== undefined ? b.order : 999;
+                        const orderA = a.sort_order !== undefined ? a.sort_order : 999;
+                        const orderB = b.sort_order !== undefined ? b.sort_order : 999;
                         if (orderA !== orderB) return orderA - orderB;
                         return (a.name || '').localeCompare(b.name || '');
                     });
