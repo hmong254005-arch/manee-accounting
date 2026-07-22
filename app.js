@@ -1084,6 +1084,7 @@ function renderPOSStats() {
     today.setHours(0, 0, 0, 0);
     
     let totalSales = 0;
+    let totalItems = 0;
     const itemStats = {};
     
     transactions.forEach(tx => {
@@ -1093,6 +1094,7 @@ function renderPOSStats() {
             itemStats[tx.detail].count += 1;
             itemStats[tx.detail].revenue += tx.amount;
             totalSales += tx.amount;
+            totalItems += 1;
         }
     });
     
@@ -1119,6 +1121,10 @@ function renderPOSStats() {
     }
     
     totalEl.innerText = `฿${totalSales.toLocaleString()}`;
+    const itemsTotalEl = document.getElementById('pos-today-items-total');
+    if (itemsTotalEl) {
+        itemsTotalEl.innerText = `รวมยอดขายวันนี้ (${totalItems} รายการ)`;
+    }
 }
 
 function setupPOSDailySummary() {
