@@ -878,7 +878,7 @@ function renderManageMenuTable() {
     
     if (products.length === 0) {
         const emptyTbody = document.createElement('tbody');
-        emptyTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #64748B;">ยังไม่มีเมนูสินค้า กรุณาเพิ่มเมนูใหม่</td></tr>';
+        emptyTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีเมนูสินค้า กรุณาเพิ่มเมนูใหม่</td></tr>';
         table.appendChild(emptyTbody);
         return;
     }
@@ -898,7 +898,7 @@ function renderManageMenuTable() {
         const headerTr = document.createElement('tr');
         headerTr.className = 'menu-category-header';
         headerTr.innerHTML = `
-            <td colspan="5" style="background-color: #f8fafc; cursor: pointer; border-bottom: 2px solid #e2e8f0;">
+            <td colspan="6" style="background-color: #f8fafc; cursor: pointer; border-bottom: 2px solid #e2e8f0;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong style="font-size: 15px; color: var(--primary-color);">${cat} <span style="font-size: 13px; color: var(--text-secondary); font-weight: normal;">(${grouped[cat].length} รายการ)</span></strong>
                     <span class="accordion-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
@@ -916,7 +916,10 @@ function renderManageMenuTable() {
             tr.className = `menu-item-row`;
             tr.dataset.id = p.id;
             tr.innerHTML = `
-                <td style="cursor: grab;"><span class="color-dot" style="background-color: ${p.color};"></span></td>
+                <td class="drag-handle" style="cursor: grab; width: 30px; text-align: center; color: #cbd5e1;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
+                </td>
+                <td><span class="color-dot" style="background-color: ${p.color};"></span></td>
                 <td>${p.name}</td>
                 <td class="hide-on-mobile"><span class="badge" style="background-color:#E2E8F0;color:#1E293B;">${cat}</span></td>
                 <td>฿${p.price.toLocaleString()}</td>
@@ -953,6 +956,7 @@ function renderManageMenuTable() {
         if (window.Sortable) {
             Sortable.create(itemsTbody, {
                 animation: 150,
+                handle: '.drag-handle',
                 onEnd: async function(evt) {
                     const tbody = evt.to;
                     const rows = tbody.querySelectorAll('.menu-item-row');
