@@ -835,17 +835,20 @@ function setupProducts() {
             const price = parseFloat(priceInput.value);
             const category = categorySelect ? categorySelect.value : 'ทั่วไป';
             const color = colorSelect.value;
+            const orderInput = document.getElementById('new-product-order');
+            const order = orderInput ? parseInt(orderInput.value) || 0 : 0;
 
             if (!name || isNaN(price) || price < 0) {
                 showToast("กรุณากรอกชื่อและราคาให้ถูกต้อง", "error");
                 return;
             }
 
-            const newProduct = { name, price, category, color };
+            const newProduct = { name, price, category, color, order };
             await window.dbAPI.addProduct(newProduct);
             
             nameInput.value = '';
             priceInput.value = '';
+            if (orderInput) orderInput.value = (order + 1).toString();
             showToast("เพิ่มเมนูเรียบร้อยแล้ว");
             
             await loadProducts();
@@ -855,6 +858,13 @@ function setupProducts() {
 
 async function loadProducts() {
     products = await window.dbAPI.getProducts();
+    // Sort products by order (ascending), then by name
+    products.sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : 999;
+        const orderB = b.order !== undefined ? b.order : 999;
+        if (orderA !== orderB) return orderA - orderB;
+        return (a.name || '').localeCompare(b.name || '');
+    });
     renderManageMenuTable();
     renderPOSGrid();
 }
@@ -888,7 +898,7 @@ function renderManageMenuTable() {
             <td colspan="5" style="background-color: #f8fafc; cursor: pointer; border-bottom: 2px solid #e2e8f0;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <strong style="font-size: 15px; color: var(--primary-color);">${cat} <span style="font-size: 13px; color: var(--text-secondary); font-weight: normal;">(${grouped[cat].length} รายการ)</span></strong>
-                    <span class="accordion-icon mobile-only-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+                    <span class="accordion-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
                 </div>
             </td>
         `;
@@ -917,29 +927,23 @@ function renderManageMenuTable() {
             itemRows.push(tr);
         });
 
-        // Add toggle behavior
+        // Add toggle behavior for ALL screens (desktop and mobile)
         headerTr.onclick = function() {
-            if (window.innerWidth <= 768) {
-                const isExpanded = this.classList.contains('expanded');
-                const icon = this.querySelector('polyline');
-                if (isExpanded) {
-                    this.classList.remove('expanded');
-                    icon.setAttribute('points', '6 9 12 15 18 9');
-                    itemRows.forEach(row => row.style.display = 'none');
-                } else {
-                    this.classList.add('expanded');
-                    icon.setAttribute('points', '18 15 12 9 6 15');
-                    itemRows.forEach(row => row.style.display = '');
-                }
+            const isExpanded = this.classList.contains('expanded');
+            const icon = this.querySelector('polyline');
+            if (isExpanded) {
+                this.classList.remove('expanded');
+                icon.setAttribute('points', '6 9 12 15 18 9');
+                itemRows.forEach(row => row.style.display = 'none');
+            } else {
+                this.classList.add('expanded');
+                icon.setAttribute('points', '18 15 12 9 6 15');
+                itemRows.forEach(row => row.style.display = '');
             }
         };
 
-        // Initialize display state based on window width
-        if (window.innerWidth <= 768) {
-            itemRows.forEach(row => row.style.display = 'none');
-        } else {
-            headerTr.style.cursor = 'default';
-        }
+        // Initialize display state (Collapse by default on all screens)
+        itemRows.forEach(row => row.style.display = 'none');
         
         catIndex++;
     }
@@ -962,6 +966,7 @@ window.editProduct = function(id) {
     document.getElementById('edit-product-price').value = product.price;
     document.getElementById('edit-product-category').value = product.category || 'กาแฟ';
     document.getElementById('edit-product-color').value = product.color;
+    document.getElementById('edit-product-order').value = product.order !== undefined ? product.order : 999;
     
     document.getElementById('edit-product-modal').classList.add('active');
 }
@@ -979,13 +984,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = Number(document.getElementById('edit-product-price').value);
             const category = document.getElementById('edit-product-category').value;
             const color = document.getElementById('edit-product-color').value;
+            const order = parseInt(document.getElementById('edit-product-order').value) || 0;
             
             if (!name || isNaN(price) || price < 0) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
                 return;
             }
             
-            await window.dbAPI.updateProduct({ id, name, price, category, color });
+            await window.dbAPI.updateProduct({ id, name, price, category, color, order });
             modal.classList.remove('active');
             await loadProducts();
             showToast("แก้ไขเมนูเรียบร้อยแล้ว");
