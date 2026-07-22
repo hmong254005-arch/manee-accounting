@@ -1476,3 +1476,12 @@ function showCalendarDetail(year, month, day) {
 
     modal.classList.add('active');
 }
+
+window.forceUpdateApp = function() {
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+        });
+    }
+    window.location.reload(true);
+};
