@@ -966,7 +966,7 @@ tr:last-child td {
 
     /* POS Buttons */
     .pos-btn {
-        min-height: 80px;
+        min-height: 60px;
     }
 
     /* Hide unnecessary columns on mobile (Category, Type) */
