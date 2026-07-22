@@ -870,13 +870,16 @@ async function loadProducts() {
 }
 
 function renderManageMenuTable() {
-    const tbody = document.getElementById('products-tbody');
-    if (!tbody) return;
+    const table = document.getElementById('menu-table');
+    if (!table) return;
     
-    tbody.innerHTML = '';
+    const existingTbodies = table.querySelectorAll('tbody');
+    existingTbodies.forEach(tb => tb.remove());
     
     if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #64748B;">ยังไม่มีเมนูสินค้า กรุณาเพิ่มเมนูใหม่</td></tr>';
+        const emptyTbody = document.createElement('tbody');
+        emptyTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #64748B;">ยังไม่มีเมนูสินค้า กรุณาเพิ่มเมนูใหม่</td></tr>';
+        table.appendChild(emptyTbody);
         return;
     }
 
@@ -891,7 +894,7 @@ function renderManageMenuTable() {
     for (const cat in grouped) {
         const catId = `menu-cat-${catIndex}`;
         
-        // Category Header Row
+        const headerTbody = document.createElement('tbody');
         const headerTr = document.createElement('tr');
         headerTr.className = 'menu-category-header';
         headerTr.innerHTML = `
@@ -902,15 +905,18 @@ function renderManageMenuTable() {
                 </div>
             </td>
         `;
-        
-        tbody.appendChild(headerTr);
+        headerTbody.appendChild(headerTr);
+        table.appendChild(headerTbody);
 
-        const itemRows = [];
+        const itemsTbody = document.createElement('tbody');
+        itemsTbody.className = `sortable-category ${catId}`;
+        
         grouped[cat].forEach(p => {
             const tr = document.createElement('tr');
-            tr.className = `menu-item-row ${catId}`;
+            tr.className = `menu-item-row`;
+            tr.dataset.id = p.id;
             tr.innerHTML = `
-                <td><span class="color-dot" style="background-color: ${p.color};"></span></td>
+                <td style="cursor: grab;"><span class="color-dot" style="background-color: ${p.color};"></span></td>
                 <td>${p.name}</td>
                 <td class="hide-on-mobile"><span class="badge" style="background-color:#E2E8F0;color:#1E293B;">${cat}</span></td>
                 <td>฿${p.price.toLocaleString()}</td>
@@ -923,27 +929,52 @@ function renderManageMenuTable() {
                     </button>
                 </td>
             `;
-            tbody.appendChild(tr);
-            itemRows.push(tr);
+            itemsTbody.appendChild(tr);
         });
+        
+        table.appendChild(itemsTbody);
 
-        // Add toggle behavior for ALL screens (desktop and mobile)
         headerTr.onclick = function() {
             const isExpanded = this.classList.contains('expanded');
             const icon = this.querySelector('polyline');
             if (isExpanded) {
                 this.classList.remove('expanded');
                 icon.setAttribute('points', '6 9 12 15 18 9');
-                itemRows.forEach(row => row.style.display = 'none');
+                itemsTbody.style.display = 'none';
             } else {
                 this.classList.add('expanded');
                 icon.setAttribute('points', '18 15 12 9 6 15');
-                itemRows.forEach(row => row.style.display = '');
+                itemsTbody.style.display = '';
             }
         };
 
-        // Initialize display state (Collapse by default on all screens)
-        itemRows.forEach(row => row.style.display = 'none');
+        itemsTbody.style.display = 'none';
+
+        if (window.Sortable) {
+            Sortable.create(itemsTbody, {
+                animation: 150,
+                onEnd: async function(evt) {
+                    const tbody = evt.to;
+                    const rows = tbody.querySelectorAll('.menu-item-row');
+                    const updates = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        const id = rows[i].dataset.id;
+                        const p = products.find(prod => prod.id === id);
+                        if (p) p.order = i + 1;
+                        updates.push(window.dbAPI.updateProduct({ id: id, order: i + 1 }));
+                    }
+                    await Promise.all(updates);
+                    
+                    products.sort((a, b) => {
+                        const orderA = a.order !== undefined ? a.order : 999;
+                        const orderB = b.order !== undefined ? b.order : 999;
+                        if (orderA !== orderB) return orderA - orderB;
+                        return (a.name || '').localeCompare(b.name || '');
+                    });
+                    renderPOSGrid();
+                }
+            });
+        }
         
         catIndex++;
     }

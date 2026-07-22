@@ -11,7 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
+    <!-- App Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
@@ -188,8 +189,6 @@
                         <option value="#607d8b">สีเทาอมฟ้า</option>
                         <option value="#212121">สีดำ</option>
                     </select>
-                    <label style="font-size: 14px; margin-top: 5px;">ลำดับ (ตัวเลขน้อย = อยู่บนสุด)</label>
-                    <input type="number" id="edit-product-order" value="1">
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
                         <button id="save-edit-product-btn" class="btn btn-primary" style="flex: 1;">บันทึก</button>
                         <button id="cancel-edit-product-btn" class="btn btn-secondary" style="flex: 1;">ยกเลิก</button>
@@ -486,12 +485,11 @@
                         <option value="#607d8b">สีเทาอมฟ้า</option>
                         <option value="#212121">สีดำ</option>
                     </select>
-                    <input type="number" id="new-product-order" placeholder="ลำดับ (ยิ่งน้อย ยิ่งอยู่บนสุด)" value="1" style="grid-column: span 2;">
                     <button id="add-product-btn" class="btn btn-primary" style="grid-column: span 2;">เพิ่มเมนู</button>
                 </div>
 
                 <div class="table-container">
-                    <table class="data-table">
+                    <table class="data-table" id="menu-table">
                         <thead>
                             <tr>
                                 <th>สี</th>
@@ -501,9 +499,7 @@
                                 <th style="text-align: right;">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="products-tbody">
-                            <!-- Product rows populated here -->
-                        </tbody>
+                        <!-- tbodies will be dynamically injected here -->
                     </table>
                 </div>
             </section>
@@ -571,9 +567,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="db.js?v=5"></script>
-    <script src="ai.js?v=5"></script>
-    <script src="app.js?v=5"></script>
+    <script src="db.js?v=6"></script>
+    <script src="ai.js?v=6"></script>
+    <script src="app.js?v=6"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
