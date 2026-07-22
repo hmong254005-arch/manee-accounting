@@ -665,8 +665,8 @@ tr:last-child td {
     color: white;
     border: none;
     border-radius: 12px;
-    padding: 24px 16px;
-    font-size: 16px;
+    padding: 12px 8px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -675,9 +675,9 @@ tr:last-child td {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     font-family: inherit;
-    min-height: 120px;
+    min-height: 60px;
 }
 
 .pos-btn:hover {
@@ -691,7 +691,7 @@ tr:last-child td {
 }
 
 .pos-price {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.9;
     font-weight: normal;
 }
@@ -966,7 +966,7 @@ tr:last-child td {
 
     /* POS Buttons */
     .pos-btn {
-        min-height: 120px;
+        min-height: 80px;
     }
 
     /* Hide unnecessary columns on mobile (Category, Type) */
