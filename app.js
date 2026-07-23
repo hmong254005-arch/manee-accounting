@@ -1215,12 +1215,16 @@ function renderPOSGrid() {
 
     // Render each category
     for (const [cat, items] of Object.entries(grouped)) {
-        const section = document.createElement('div');
-        section.className = 'pos-category-section';
+        const section = document.createElement('details');
+        section.className = 'pos-category-section filter-accordion';
+        section.open = true; // Open by default
         
-        const title = document.createElement('h3');
+        const title = document.createElement('summary');
         title.className = 'pos-category-title';
-        title.innerHTML = `<span>📂</span> ${cat}`;
+        title.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;"><span>📂</span> ${cat}</div>
+            <svg class="accordion-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        `;
         section.appendChild(title);
         
         const grid = document.createElement('div');
