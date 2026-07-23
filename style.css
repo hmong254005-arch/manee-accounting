@@ -718,8 +718,8 @@ tr:last-child td {
 
 .pos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
 }
 
 .pos-category-section {
@@ -743,8 +743,8 @@ tr:last-child td {
     color: white;
     border: none;
     border-radius: 12px;
-    padding: 12px 8px;
-    font-size: 14px;
+    padding: 8px 6px;
+    font-size: 11px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -753,9 +753,9 @@ tr:last-child td {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
     font-family: inherit;
-    min-height: 60px;
+    min-height: 42px;
 }
 
 .pos-btn:hover {
@@ -769,7 +769,7 @@ tr:last-child td {
 }
 
 .pos-price {
-    font-size: 12px;
+    font-size: 10px;
     opacity: 0.9;
     font-weight: normal;
 }
