@@ -742,11 +742,16 @@ function updateDashboard() {
     const totalExpense = storeExpense + houseExpense;
     const netBalance = totalIncome - totalExpense;
 
-    document.getElementById('summary-store-profit').innerText = `฿${storeProfit.toLocaleString()}`;
-    document.getElementById('summary-store-expense').innerText = `฿${storeExpense.toLocaleString()}`;
-    document.getElementById('summary-house-expense').innerText = `฿${houseExpense.toLocaleString()}`;
-    document.getElementById('summary-total-income').innerText = `฿${totalIncome.toLocaleString()}`;
-    document.getElementById('summary-net-balance').innerText = `฿${netBalance.toLocaleString()}`;
+    const safeSetText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    };
+
+    safeSetText('summary-store-profit', `฿${storeProfit.toLocaleString()}`);
+    safeSetText('summary-store-expense', `฿${storeExpense.toLocaleString()}`);
+    safeSetText('summary-house-expense', `฿${houseExpense.toLocaleString()}`);
+    safeSetText('summary-total-income', `฿${totalIncome.toLocaleString()}`);
+    safeSetText('summary-net-balance', `฿${netBalance.toLocaleString()}`);
 
     // Update Best Sellers with filtered data
     updateBestSellers(filteredTx);
