@@ -830,8 +830,14 @@ function setupProducts() {
                 return;
             }
 
-            const newProduct = { name, price, category, color, sort_order };
-            await window.dbAPI.addProduct(newProduct);
+            const newProduct = { name, price, category, color };
+            const addedProd = await window.dbAPI.addProduct(newProduct);
+            
+            if (addedProd && addedProd.id) {
+                let savedOrder = JSON.parse(localStorage.getItem('menuSortOrder')) || {};
+                savedOrder[addedProd.id] = sort_order;
+                localStorage.setItem('menuSortOrder', JSON.stringify(savedOrder));
+            }
             
             nameInput.value = '';
             priceInput.value = '';
@@ -1027,7 +1033,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            await window.dbAPI.updateProduct({ id, name, price, category, color, sort_order });
+            await window.dbAPI.updateProduct({ id, name, price, category, color });
+            
+            // If they changed the order in the edit modal, save it to local storage
+            let savedOrder = JSON.parse(localStorage.getItem('menuSortOrder')) || {};
+            savedOrder[id] = sort_order;
+            localStorage.setItem('menuSortOrder', JSON.stringify(savedOrder));
+            
             modal.classList.remove('active');
             await loadProducts();
             showToast("แก้ไขเมนูเรียบร้อยแล้ว");
