@@ -138,6 +138,7 @@ function setupAuthUI() {
             alert("ไม่สามารถเข้าสู่ระบบได้: " + e.message);
         }
     });
+    }
 }
 
 function setupNavigation() {
