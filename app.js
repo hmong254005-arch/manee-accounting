@@ -139,16 +139,25 @@ function setupNavigation() {
     if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', () => {
             if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('open');
+                sidebar.classList.toggle('mobile-open');
                 if(overlay) overlay.classList.toggle('active');
             } else {
                 sidebar.classList.toggle('collapsed');
             }
         });
     }
+    
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+            if(overlay) overlay.classList.toggle('active');
+        });
+    }
 
     if (overlay) {
         overlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
         });
@@ -164,7 +173,15 @@ function setupNavigation() {
 
             // Update active view
             views.forEach(view => view.classList.remove('active'));
-            document.getElementById(`view-${tab}`).classList.add('active');
+            const targetView = document.getElementById(`view-${tab}`);
+            if (targetView) targetView.classList.add('active');
+            
+            // Close mobile menu if open
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('mobile-open');
+                sidebar.classList.remove('open');
+                if(overlay) overlay.classList.remove('active');
+            }
 
             // Refresh data if needed
             if (tab === 'dashboard') {
