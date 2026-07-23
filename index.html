@@ -22,7 +22,7 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
     
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
@@ -46,16 +46,16 @@
                 <label for="auth-password">รหัสผ่าน</label>
                 <input type="password" id="auth-password" placeholder="ตั้งรหัสผ่าน 6 ตัวขึ้นไป" style="margin-bottom: 20px;">
                 
-                <button id="btn-email-login" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+                <button id="btn-login-submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     เข้าสู่ระบบ / สมัครสมาชิก
                 </button>
-                <button id="btn-back-to-auth" class="btn" style="width: 100%; background: #f1f5f9; color: var(--text-secondary);">ย้อนกลับ</button>
+                <button id="btn-back-to-options" class="btn" style="width: 100%; background: #f1f5f9; color: var(--text-secondary);">ย้อนกลับ</button>
             </div>
 
             <!-- Initial Auth Options -->
             <div id="auth-options">
-                <button id="btn-show-email-auth" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <button id="btn-show-email-login" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     สมัคร / เข้าสู่ระบบด้วยอีเมล
                 </button>
@@ -617,7 +617,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="db.js?v=10"></script>
     <script src="ai.js?v=10"></script>
-    <script src="app.js?v=12"></script>
+    <script src="app.js?v=15"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
