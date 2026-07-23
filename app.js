@@ -245,7 +245,18 @@ function setupSettings() {
         modal.classList.add('active');
     }
 
-    if (openBtn) openBtn.addEventListener('click', () => modal.classList.add('active'));
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            // Close mobile sidebar
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth <= 768 && sidebar) {
+                sidebar.classList.remove('mobile-open');
+                if(overlay) overlay.classList.remove('active');
+            }
+        });
+    }
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
 
     if (saveBtn) {
