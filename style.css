@@ -1141,74 +1141,93 @@ tr:last-child td {
 .gemini-wrapper > * {
     pointer-events: auto;
 }
-.chat-input-container {
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-.gemini-pill-input {
+.line-style-container {
     background: #ffffff;
-    border-radius: 32px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: flex;
     align-items: flex-end;
-    padding: 6px 12px;
     width: 100%;
-    max-width: 600px;
+    padding: 8px 10px;
+    border-top: 1px solid #e5e5e5;
     gap: 8px;
-    border: 1px solid var(--border-color);
 }
-.gemini-pill-input textarea {
+.line-left-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+.line-expand-btn {
+    margin-bottom: 4px;
+}
+.line-icon-btn {
+    background: none;
+    border: none;
+    color: #555555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+}
+.line-icon-btn:hover {
+    background: rgba(0,0,0,0.05);
+}
+.line-icon-btn svg {
+    width: 22px;
+    height: 22px;
+}
+.line-input-wrapper {
+    flex: 1;
+    background: #f0f0f0;
+    border-radius: 20px;
+    display: flex;
+    align-items: flex-end;
+    padding: 4px 10px;
+}
+.line-input-wrapper textarea {
     flex: 1;
     border: none;
     outline: none;
     background: transparent;
     resize: none;
-    padding: 10px 0;
+    padding: 6px 0;
     font-size: 15px;
-    max-height: 120px;
+    max-height: 100px;
     line-height: 1.4;
 }
-.gemini-icon-btn {
+.line-smile-btn {
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: #888888;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    transition: background 0.2s;
+    padding: 0;
     margin-bottom: 2px;
+    margin-left: 4px;
 }
-.gemini-icon-btn:hover {
-    background: var(--bg-color);
-}
-.gemini-action-btns {
+.line-right-actions {
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
-.gemini-primary-btn {
-    background: #E8F0FE;
-    color: var(--primary-color);
+.line-send-btn {
+    background: #0084ff;
+    color: white;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s;
-}
-.gemini-primary-btn.typing {
-    background: var(--primary-color);
-    color: white;
 }
 .chat-container {
     padding-bottom: 120px; /* Space for the floating pill */

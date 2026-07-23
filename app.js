@@ -334,10 +334,8 @@ function setupChat() {
         });
     }
 
-    const sendBtn = document.getElementById('gemini-primary-btn');
+    const sendBtn = document.getElementById('send-btn');
     const micBtn = document.getElementById('mic-btn');
-    const iconWave = document.getElementById('icon-wave');
-    const iconSend = document.getElementById('icon-send');
     const input = document.getElementById('chat-input');
     const attachBtn = document.getElementById('attach-btn');
     const fileInput = document.getElementById('chat-image-upload');
@@ -433,12 +431,8 @@ async function handleSendMessage() {
     input.value = '';
     input.style.height = 'auto';
     
-    // Reset Gemini button state
-    const pBtn = document.getElementById('gemini-primary-btn');
-    if (pBtn) {
-        pBtn.classList.remove('typing');
-        document.getElementById('icon-wave').style.display = 'block';
-        document.getElementById('icon-send').style.display = 'none';
+    if(typeof handleLineInput === 'function') {
+        handleLineInput();
     }
     const previewContainer = document.getElementById('chat-image-preview-container');
     previewContainer.style.display = 'none';
@@ -1498,4 +1492,40 @@ window.forceUpdateApp = function() {
         });
     }
     window.location.reload(true);
+};
+
+// --- LINE Style UI Handlers ---
+window.handleLineInput = function() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const leftActions = document.getElementById('line-left-actions');
+    const expandBtn = document.getElementById('line-expand-btn');
+
+    if (input && input.value.trim().length > 0) {
+        if(sendBtn) sendBtn.style.display = 'flex';
+        if(micBtn) micBtn.style.display = 'none';
+        if(leftActions) leftActions.style.display = 'none';
+        if(expandBtn) expandBtn.style.display = 'flex';
+    } else {
+        if(sendBtn) sendBtn.style.display = 'none';
+        if(micBtn) micBtn.style.display = 'flex';
+        if(leftActions) leftActions.style.display = 'flex';
+        if(expandBtn) expandBtn.style.display = 'none';
+    }
+};
+
+window.toggleLineActions = function() {
+    const leftActions = document.getElementById('line-left-actions');
+    const expandBtn = document.getElementById('line-expand-btn');
+    
+    if (leftActions && expandBtn) {
+        if (leftActions.style.display === 'none') {
+            leftActions.style.display = 'flex';
+            expandBtn.style.display = 'none';
+        } else {
+            leftActions.style.display = 'none';
+            expandBtn.style.display = 'flex';
+        }
+    }
 };
