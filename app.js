@@ -50,15 +50,21 @@ function setupAuthUI() {
     const emailForm = document.getElementById('email-auth-form');
     const authLoading = document.getElementById('auth-loading');
     
-    document.getElementById('btn-show-email-login').addEventListener('click', () => {
-        authOptions.style.display = 'none';
-        emailForm.style.display = 'block';
-    });
+    const showEmailBtn = document.getElementById('btn-show-email-login') || document.getElementById('btn-show-email-auth');
+    if (showEmailBtn) {
+        showEmailBtn.addEventListener('click', () => {
+            authOptions.style.display = 'none';
+            emailForm.style.display = 'block';
+        });
+    }
     
-    document.getElementById('btn-back-to-options').addEventListener('click', () => {
-        emailForm.style.display = 'none';
-        authOptions.style.display = 'block';
-    });
+    const backBtn = document.getElementById('btn-back-to-options') || document.getElementById('btn-back-to-auth');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            emailForm.style.display = 'none';
+            authOptions.style.display = 'block';
+        });
+    }
     
     const showLoading = () => {
         authOptions.style.display = 'none';
@@ -81,23 +87,28 @@ function setupAuthUI() {
     };
     
     // Guest Login
-    document.getElementById('btn-guest-login').addEventListener('click', async () => {
-        showLoading();
-        try {
-            await window.dbAPI.signInAnonymously();
-            await handleLoginSuccess();
-        } catch (e) {
-            hideLoading();
-            alert("เข้าใช้งานทันทีไม่สำเร็จ: " + e.message);
-        }
-    });
+    const guestBtn = document.getElementById('btn-guest-login');
+    if (guestBtn) {
+        guestBtn.addEventListener('click', async () => {
+            showLoading();
+            try {
+                await window.dbAPI.signInAnonymously();
+                await handleLoginSuccess();
+            } catch (e) {
+                hideLoading();
+                alert("เข้าใช้งานทันทีไม่สำเร็จ: " + e.message);
+            }
+        });
+    }
     
     // Email Login/Signup
-    document.getElementById('btn-login-submit').addEventListener('click', async () => {
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        
-        if (!email || !password) {
+    const loginSubmitBtn = document.getElementById('btn-login-submit') || document.getElementById('btn-email-login');
+    if (loginSubmitBtn) {
+        loginSubmitBtn.addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            
+            if (!email || !password) {
             alert("กรุณากรอกอีเมลและรหัสผ่าน");
             return;
         }
