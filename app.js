@@ -783,24 +783,24 @@ window.deleteTx = async function(id) {
 
 function getFilteredDashboardTransactions() {
     const periodSelect = document.getElementById('dashboard-period-select');
-    const period = periodSelect ? periodSelect.value : 'daily';
+    const period = periodSelect ? periodSelect.value : 'today';
     
     if (period === 'all') return transactions;
     
     const now = new Date();
     let startDate = new Date();
     
-    if (period === 'daily') {
+    if (period === 'today') {
         startDate.setHours(0, 0, 0, 0);
-    } else if (period === 'weekly') {
+    } else if (period === 'week') {
         // Last 7 days including today
         startDate.setDate(now.getDate() - 6);
         startDate.setHours(0, 0, 0, 0);
-    } else if (period === 'monthly') {
+    } else if (period === 'month') {
         // Since start of this month
         startDate.setDate(1);
         startDate.setHours(0, 0, 0, 0);
-    } else if (period === 'yearly') {
+    } else if (period === 'year') {
         // Since start of this year
         startDate.setMonth(0, 1);
         startDate.setHours(0, 0, 0, 0);
