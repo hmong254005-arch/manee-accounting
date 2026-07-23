@@ -470,16 +470,21 @@
                             </div>
                         </div>
                         
-                        <div style="background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                            <h3 style="font-size: 16px; color: var(--text-secondary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                                ขายล่าสุด
-                            </h3>
-                            <div id="pos-stats-list" style="display: flex; flex-direction: column; gap: 10px;">
-                                <!-- Recent sales will be injected here -->
-                                <p style="color: var(--text-secondary); font-size: 14px;">ยังไม่มีข้อมูล</p>
+                        <details class="filter-accordion" style="background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                            <summary style="font-size: 16px; color: var(--text-secondary); padding: 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                    ขายล่าสุด
+                                </div>
+                                <svg class="accordion-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </summary>
+                            <div style="padding: 0 20px 20px 20px;">
+                                <div id="pos-stats-list" style="display: flex; flex-direction: column; gap: 10px;">
+                                    <!-- Recent sales will be injected here -->
+                                    <p style="color: var(--text-secondary); font-size: 14px;">ยังไม่มีข้อมูล</p>
+                                </div>
                             </div>
-                        </div>
+                        </details>
                     </div>
 
                     <!-- POS Grid -->
