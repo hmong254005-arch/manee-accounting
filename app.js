@@ -372,24 +372,14 @@ function setupChat() {
     input.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
-        
-        // Gemini style button toggle
-        if (sendBtn && iconWave && iconSend) {
-            if (this.value.trim().length > 0) {
-                sendBtn.classList.add('typing');
-                iconWave.style.display = 'none';
-                iconSend.style.display = 'block';
-            } else {
-                sendBtn.classList.remove('typing');
-                iconWave.style.display = 'block';
-                iconSend.style.display = 'none';
-            }
-        }
     });
 
-    attachBtn.addEventListener('click', () => fileInput.click());
+    if (attachBtn) {
+        attachBtn.addEventListener('click', () => fileInput.click());
+    }
 
-    fileInput.addEventListener('change', (e) => {
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             currentChatImageMimeType = file.type;
