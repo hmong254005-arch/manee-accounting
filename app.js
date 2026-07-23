@@ -391,15 +391,18 @@ function setupChat() {
             };
             reader.readAsDataURL(file);
         }
-    });
+        });
+    }
 
-    removeImgBtn.addEventListener('click', () => {
-        currentChatImageBase64 = null;
-        currentChatImageMimeType = null;
-        fileInput.value = '';
-        previewContainer.style.display = 'none';
-        previewImg.src = '';
-    });
+    if (removeImgBtn) {
+        removeImgBtn.addEventListener('click', () => {
+            currentChatImageBase64 = null;
+            currentChatImageMimeType = null;
+            if(fileInput) fileInput.value = '';
+            if(previewContainer) previewContainer.style.display = 'none';
+            if(previewImg) previewImg.src = '';
+        });
+    }
 }
 
 async function handleSendMessage() {
