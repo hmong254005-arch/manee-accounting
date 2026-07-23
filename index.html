@@ -124,9 +124,25 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
             <div class="mobile-top-title">มานี บัญชี</div>
-            <div style="width: 24px;"></div> <!-- Spacer for balance -->
+            <button id="mobile-refresh-btn" class="mobile-menu-btn" style="color: var(--primary-color);" onclick="forceRefreshApp()" title="รีเฟรชระบบ">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-5.67"/></svg>
+            </button>
         </div>
 
+        <script>
+        function forceRefreshApp() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                    window.location.href = window.location.href.split('?')[0] + '?reload=' + new Date().getTime();
+                });
+            } else {
+                window.location.reload(true);
+            }
+        }
+        </script>
         <!-- Sidebar Overlay (Hidden by default) -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
