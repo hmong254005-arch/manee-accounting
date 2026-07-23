@@ -22,7 +22,7 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link rel="stylesheet" href="style.css?v=19">
+    <link rel="stylesheet" href="style.css?v=20">
     
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
@@ -384,33 +384,39 @@
 
             <!-- View: Transactions -->
             <section id="view-transactions" class="view-section">
-                <header class="view-header">
-                    <h2>รายการทั้งหมด</h2>
-                    <button class="btn btn-primary" onclick="document.getElementById('add-tx-modal').classList.add('active');" style="font-size: 14px; padding: 8px 16px; border-radius: 8px;">+ เพิ่มรายการ</button>
+                <header class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="margin: 0;">รายการทั้งหมด</h2>
+                    <div style="flex-grow: 1; max-width: 200px; text-align: right;">
+                        <input type="date" id="filter-date" class="form-control" style="width: 150px; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 14px;" title="เลือกวันที่">
+                    </div>
                 </header>
 
-                <div class="tx-filter-container" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
-                    <div class="tx-filter-group">
-                        <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">หมวดหมู่</label>
-                        <div class="tx-filter-tabs" id="filter-category">
-                            <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
-                            <button class="tx-filter-btn" data-filter="store">ร้านค้า</button>
-                            <button class="tx-filter-btn" data-filter="house">ครัวเรือน</button>
+                <details class="filter-accordion" style="margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 12px; background: white; overflow: hidden;">
+                    <summary style="padding: 12px 16px; font-weight: 500; cursor: pointer; color: var(--text-primary); user-select: none; display: flex; justify-content: space-between; align-items: center;">
+                        <span>ตัวกรอง (หมวดหมู่, ประเภท)</span>
+                        <svg class="accordion-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div style="padding: 16px; border-top: 1px solid var(--border-color);">
+                        <div class="tx-filter-container" style="display: flex; gap: 15px; align-items: flex-start; flex-wrap: wrap;">
+                            <div class="tx-filter-group">
+                                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">หมวดหมู่</label>
+                                <div class="tx-filter-tabs" id="filter-category">
+                                    <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
+                                    <button class="tx-filter-btn" data-filter="store">ร้านค้า</button>
+                                    <button class="tx-filter-btn" data-filter="house">ครัวเรือน</button>
+                                </div>
+                            </div>
+                            <div class="tx-filter-group">
+                                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">ประเภท</label>
+                                <div class="tx-filter-tabs" id="filter-type">
+                                    <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
+                                    <button class="tx-filter-btn" data-filter="income">รายรับ</button>
+                                    <button class="tx-filter-btn" data-filter="expense">รายจ่าย</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="tx-filter-group">
-                        <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">ประเภท</label>
-                        <div class="tx-filter-tabs" id="filter-type">
-                            <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
-                            <button class="tx-filter-btn" data-filter="income">รายรับ</button>
-                            <button class="tx-filter-btn" data-filter="expense">รายจ่าย</button>
-                        </div>
-                    </div>
-                    <div class="tx-filter-group" style="flex-grow: 1; max-width: 200px;">
-                        <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">วันที่</label>
-                        <input type="date" id="filter-date" class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit;">
-                    </div>
-                </div>
+                </details>
                 
                 <!-- Quick Summary for Filtered Results -->
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">

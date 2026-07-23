@@ -1533,3 +1533,16 @@ tr:last-child td {
     height: 350px;
     width: 100%;
 }
+
+details.filter-accordion summary::marker,
+details.filter-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+details.filter-accordion .accordion-arrow {
+    transition: transform 0.3s ease;
+}
+
+details.filter-accordion[open] .accordion-arrow {
+    transform: rotate(180deg);
+}
