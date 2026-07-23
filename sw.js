@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manee-cache-v19';
+const CACHE_NAME = 'manee-cache-v20';
 const urlsToCache = [
   './',
   './index.html',

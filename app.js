@@ -1002,7 +1002,7 @@ window.editProduct = function(id) {
     document.getElementById('edit-product-price').value = product.price;
     document.getElementById('edit-product-category').value = product.category || 'กาแฟ';
     document.getElementById('edit-product-color').value = product.color;
-    document.getElementById('edit-product-order').value = product.order !== undefined ? product.order : 999;
+    document.getElementById('edit-product-order').value = product.sort_order !== undefined ? product.sort_order : 999;
     
     document.getElementById('edit-product-modal').classList.add('active');
 }
@@ -1020,14 +1020,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = Number(document.getElementById('edit-product-price').value);
             const category = document.getElementById('edit-product-category').value;
             const color = document.getElementById('edit-product-color').value;
-            const order = parseInt(document.getElementById('edit-product-order').value) || 0;
+            const sort_order = parseInt(document.getElementById('edit-product-order').value) || 0;
             
             if (!name || isNaN(price) || price < 0) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง');
                 return;
             }
             
-            await window.dbAPI.updateProduct({ id, name, price, category, color, order });
+            await window.dbAPI.updateProduct({ id, name, price, category, color, sort_order });
             modal.classList.remove('active');
             await loadProducts();
             showToast("แก้ไขเมนูเรียบร้อยแล้ว");
