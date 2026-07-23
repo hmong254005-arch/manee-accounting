@@ -391,35 +391,8 @@
                     </div>
                 </header>
 
-                <details class="filter-accordion" style="margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 12px; background: white; overflow: hidden;">
-                    <summary style="padding: 12px 16px; font-weight: 500; cursor: pointer; color: var(--text-primary); user-select: none; display: flex; justify-content: space-between; align-items: center;">
-                        <span>ตัวกรอง (หมวดหมู่, ประเภท)</span>
-                        <svg class="accordion-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                    </summary>
-                    <div style="padding: 16px; border-top: 1px solid var(--border-color);">
-                        <div class="tx-filter-container" style="display: flex; gap: 15px; align-items: flex-start; flex-wrap: wrap;">
-                            <div class="tx-filter-group">
-                                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">หมวดหมู่</label>
-                                <div class="tx-filter-tabs" id="filter-category">
-                                    <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
-                                    <button class="tx-filter-btn" data-filter="store">ร้านค้า</button>
-                                    <button class="tx-filter-btn" data-filter="house">ครัวเรือน</button>
-                                </div>
-                            </div>
-                            <div class="tx-filter-group">
-                                <label style="display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px;">ประเภท</label>
-                                <div class="tx-filter-tabs" id="filter-type">
-                                    <button class="tx-filter-btn active" data-filter="all">ทั้งหมด</button>
-                                    <button class="tx-filter-btn" data-filter="income">รายรับ</button>
-                                    <button class="tx-filter-btn" data-filter="expense">รายจ่าย</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-                
                 <!-- Quick Summary for Filtered Results -->
-                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; margin-top: 20px;">
                     <div style="background: #f0fdf4; padding: 12px 20px; border-radius: 12px; flex: 1; min-width: 120px; border: 1px solid #bbf7d0;">
                         <div style="font-size: 12px; color: #166534; margin-bottom: 4px;">รายรับรวม</div>
                         <div id="tx-summary-income" style="font-size: 20px; font-weight: 600; color: var(--profit-color);">฿0</div>
@@ -434,23 +407,31 @@
                     </div>
                 </div>
 
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>วันที่-เวลา</th>
-                                <th>รายการ</th>
-                                <th>หมวดหมู่</th>
-                                <th>ประเภท</th>
-                                <th style="text-align: right;">จำนวนเงิน (฿)</th>
-                                <th>จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-tbody">
-                            <!-- Transactions will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
+                <details class="filter-accordion" style="margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 12px; background: white; overflow: hidden;">
+                    <summary style="padding: 12px 16px; font-weight: 500; cursor: pointer; color: var(--text-primary); user-select: none; display: flex; justify-content: space-between; align-items: center;">
+                        <span>แสดงรายการประวัติต่างๆ</span>
+                        <svg class="accordion-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div style="padding: 16px; border-top: 1px solid var(--border-color);">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>วันที่-เวลา</th>
+                                        <th>รายการ</th>
+                                        <th>หมวดหมู่</th>
+                                        <th>ประเภท</th>
+                                        <th style="text-align: right;">จำนวนเงิน (฿)</th>
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactions-tbody">
+                                    <!-- Transactions will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
             </section>
 
             <!-- View: POS (Point of Sale) -->
