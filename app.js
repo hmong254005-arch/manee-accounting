@@ -9,14 +9,18 @@ let chatHistory = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    // Setup UI Listeners
-    setupNavigation();
-    setupSettings();
-    setupChat();
-    setupTransactionsTable();
-    setupProducts();
-    setupDashboardFilter();
-    setupCalendar();
+    // Setup UI Listeners safely
+    const safeSetup = (name, fn) => {
+        try { fn(); } catch (e) { console.error(`Error in ${name}:`, e); }
+    };
+
+    safeSetup('setupNavigation', setupNavigation);
+    safeSetup('setupSettings', setupSettings);
+    safeSetup('setupChat', setupChat);
+    safeSetup('setupTransactionsTable', setupTransactionsTable);
+    safeSetup('setupProducts', setupProducts);
+    safeSetup('setupDashboardFilter', setupDashboardFilter);
+    safeSetup('setupCalendar', setupCalendar);
     
     document.getElementById('refresh-insight-btn')?.addEventListener('click', generateInsight);
 
@@ -231,6 +235,8 @@ function setupSettings() {
     const saveBtn = document.getElementById('save-settings-btn');
     const keyInput = document.getElementById('gemini-api-key');
 
+    if (!modal || !keyInput) return;
+
     // Load saved key
     if (apiKey) keyInput.value = apiKey;
 
@@ -239,20 +245,22 @@ function setupSettings() {
         modal.classList.add('active');
     }
 
-    openBtn.addEventListener('click', () => modal.classList.add('active'));
-    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    if (openBtn) openBtn.addEventListener('click', () => modal.classList.add('active'));
+    if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
 
-    saveBtn.addEventListener('click', () => {
-        const key = keyInput.value.trim();
-        if (key) {
-            apiKey = key;
-            localStorage.setItem('manee_api_key', key);
-            modal.classList.remove('active');
-            addChatMessage("ระบบ", "บันทึก API Key เรียบร้อยแล้ว พร้อมใช้งานค่ะ!", "ai");
-        } else {
-            alert("กรุณาใส่ API Key");
-        }
-    });
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            const key = keyInput.value.trim();
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('manee_api_key', key);
+                modal.classList.remove('active');
+                if (typeof addChatMessage === 'function') addChatMessage("ระบบ", "บันทึก API Key เรียบร้อยแล้ว พร้อมใช้งานค่ะ!", "ai");
+            } else {
+                alert("กรุณาใส่ API Key");
+            }
+        });
+    }
 
     // Logout Logic
     const logoutBtn = document.getElementById('btn-logout');
