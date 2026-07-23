@@ -382,8 +382,8 @@ function setupChat() {
         });
     }
 
-    const sendBtn = document.getElementById('send-btn');
-    const micBtn = document.getElementById('mic-btn');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const micBtn = document.getElementById('line-mic-btn');
     const input = document.getElementById('chat-input');
     const attachBtn = document.getElementById('attach-btn');
     const fileInput = document.getElementById('chat-image-upload');
@@ -420,6 +420,7 @@ function setupChat() {
     input.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
+        if (typeof handleLineInput === 'function') handleLineInput();
     });
 
     if (attachBtn) {
@@ -1555,8 +1556,8 @@ window.forceUpdateApp = function() {
 // --- LINE Style UI Handlers ---
 window.handleLineInput = function() {
     const input = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
-    const micBtn = document.getElementById('mic-btn');
+    const sendBtn = document.getElementById('chat-send-btn');
+    const micBtn = document.getElementById('line-mic-btn');
     const leftActions = document.getElementById('line-left-actions');
     const expandBtn = document.getElementById('line-expand-btn');
 
