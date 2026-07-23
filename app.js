@@ -366,6 +366,9 @@ function setupSettings() {
 
 let currentChatImageBase64 = null;
 let currentChatImageMimeType = null;
+let currentChatDocBase64 = null;
+let currentChatDocMimeType = null;
+let currentChatDocName = null;
 
 function setupChat() {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -385,25 +388,60 @@ function setupChat() {
     const sendBtn = document.getElementById('chat-send-btn');
     const micBtn = document.getElementById('line-mic-btn');
     const input = document.getElementById('chat-input');
-    const attachBtn = document.getElementById('attach-btn');
     const fileInput = document.getElementById('chat-image-upload');
+    const docInput = document.getElementById('chat-doc-upload');
     const previewContainer = document.getElementById('chat-image-preview-container');
     const previewImg = document.getElementById('chat-image-preview');
     const removeImgBtn = document.getElementById('remove-image-btn');
+    const docPreviewContainer = document.getElementById('chat-doc-preview-container');
+    const docNameSpan = document.getElementById('chat-doc-name');
+    const removeDocBtn = document.getElementById('remove-doc-btn');
 
     if (sendBtn) {
         sendBtn.addEventListener('click', () => {
-            if (input.value.trim().length > 0 || currentChatImageBase64) {
+            if (input.value.trim().length > 0 || currentChatImageBase64 || currentChatDocBase64) {
                 handleSendMessage();
-            } else {
-                showToast("ฟีเจอร์สั่งงานด้วยเสียง (Voice) กำลังพัฒนา 🎙️");
             }
         });
     }
     
+    // Web Speech API for Mic
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'th-TH';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = function() {
+            if(micBtn) micBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3" fill="red"></circle></svg>';
+            input.placeholder = 'กำลังฟัง...';
+        };
+
+        recognition.onresult = function(event) {
+            const speechResult = event.results[0][0].transcript;
+            input.value += (input.value ? ' ' : '') + speechResult;
+            input.dispatchEvent(new Event('input')); // trigger height resize and button toggle
+        };
+
+        recognition.onerror = function(event) {
+            showToast("ไม่สามารถรับเสียงได้ กรุณาลองใหม่");
+        };
+
+        recognition.onend = function() {
+            if(micBtn) micBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
+            input.placeholder = 'พิมพ์ข้อความที่นี่...';
+        };
+    }
+
     if (micBtn) {
         micBtn.addEventListener('click', () => {
-            showToast("ฟีเจอร์สั่งงานด้วยเสียง (Voice) กำลังพัฒนา 🎙️");
+            if (recognition) {
+                try { recognition.start(); } catch(e) {}
+            } else {
+                showToast("เบราว์เซอร์ของคุณไม่รองรับการสั่งงานด้วยเสียง");
+            }
         });
     }
     
@@ -423,23 +461,20 @@ function setupChat() {
         if (typeof handleLineInput === 'function') handleLineInput();
     });
 
-    if (attachBtn) {
-        attachBtn.addEventListener('click', () => fileInput.click());
-    }
-
+    // Image Upload
     if (fileInput) {
         fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            currentChatImageMimeType = file.type;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                currentChatImageBase64 = ev.target.result.split(',')[1];
-                previewImg.src = ev.target.result;
-                previewContainer.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
+            const file = e.target.files[0];
+            if (file) {
+                currentChatImageMimeType = file.type;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentChatImageBase64 = ev.target.result.split(',')[1];
+                    previewImg.src = ev.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
         });
     }
 
@@ -452,19 +487,51 @@ function setupChat() {
             if(previewImg) previewImg.src = '';
         });
     }
+
+    // Document Upload
+    if (docInput) {
+        docInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                currentChatDocMimeType = file.type;
+                currentChatDocName = file.name;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentChatDocBase64 = ev.target.result.split(',')[1];
+                    if(docNameSpan) docNameSpan.innerText = file.name;
+                    if(docPreviewContainer) docPreviewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (removeDocBtn) {
+        removeDocBtn.addEventListener('click', () => {
+            currentChatDocBase64 = null;
+            currentChatDocMimeType = null;
+            currentChatDocName = null;
+            if(docInput) docInput.value = '';
+            if(docPreviewContainer) docPreviewContainer.style.display = 'none';
+        });
+    }
 }
 
 async function handleSendMessage() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     const hasImage = !!currentChatImageBase64;
+    const hasDoc = !!currentChatDocBase64;
     
-    if (!text && !hasImage) return;
+    if (!text && !hasImage && !hasDoc) return;
 
     // Add user message
     let userMsgHtml = text ? text.replace(/\n/g, '<br>') : '';
     if (hasImage) {
         userMsgHtml += `<br><img src="data:${currentChatImageMimeType};base64,${currentChatImageBase64}" style="max-height: 150px; border-radius: 8px; margin-top: 8px;">`;
+    }
+    if (hasDoc) {
+        userMsgHtml += `<br><div style="background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px; margin-top: 8px; display: inline-flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> <span style="font-size: 14px;">${currentChatDocName}</span></div>`;
     }
     
     addChatMessage("คุณ", userMsgHtml, "user");
@@ -477,12 +544,23 @@ async function handleSendMessage() {
         handleLineInput();
     }
     const previewContainer = document.getElementById('chat-image-preview-container');
-    previewContainer.style.display = 'none';
-    const b64 = currentChatImageBase64;
-    const mime = currentChatImageMimeType;
+    if(previewContainer) previewContainer.style.display = 'none';
+    const docPreviewContainer = document.getElementById('chat-doc-preview-container');
+    if(docPreviewContainer) docPreviewContainer.style.display = 'none';
+    
+    const b64 = currentChatImageBase64 || currentChatDocBase64;
+    const mime = currentChatImageMimeType || currentChatDocMimeType;
+    
     currentChatImageBase64 = null;
     currentChatImageMimeType = null;
-    document.getElementById('chat-image-upload').value = '';
+    currentChatDocBase64 = null;
+    currentChatDocMimeType = null;
+    currentChatDocName = null;
+    
+    const fileInput = document.getElementById('chat-image-upload');
+    if(fileInput) fileInput.value = '';
+    const docInput = document.getElementById('chat-doc-upload');
+    if(docInput) docInput.value = '';
 
     // Add loading indicator
     const loadingId = addChatMessage("มานี", "<span class='loading-dots'>กำลังคิด</span>", "ai", false);
