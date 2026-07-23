@@ -1522,3 +1522,14 @@ tr:last-child td {
 .sortable-ghost { opacity: 0.4; background-color: #f1f5f9; }
 .menu-item-row td { cursor: grab; }
 .menu-item-row:active td { cursor: grabbing; }
+
+.chart-container {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
