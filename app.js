@@ -1358,7 +1358,7 @@ function renderPOSStats() {
     totalEl.innerText = `฿${totalSales.toLocaleString()}`;
     const itemsTotalEl = document.getElementById('pos-today-items-total');
     if (itemsTotalEl) {
-        itemsTotalEl.innerText = `รวมยอดขายวันนี้ (${totalItems} รายการ)`;
+        itemsTotalEl.innerHTML = `${totalItems} <span style="font-size: 16px; font-weight: 400; color: var(--text-secondary);">รายการ</span>`;
     }
 }
 
