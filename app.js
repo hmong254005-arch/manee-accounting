@@ -1058,12 +1058,14 @@ function renderManageMenuTable() {
                 <td class="hide-on-mobile"><span class="badge" style="background-color:#E2E8F0;color:#1E293B;">${cat}</span></td>
                 <td>฿${p.price.toLocaleString()}</td>
                 <td style="text-align: right; white-space: nowrap;">
-                    <button class="btn btn-icon" onclick="editProduct('${p.id}')" style="margin-right: 5px; color: var(--primary-color);">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <button class="delete-btn" onclick="deleteProduct('${p.id}')">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
+                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: 16px;">
+                        <button class="btn btn-icon" onclick="editProduct('${p.id}')" style="color: var(--primary-color); padding: 8px; border-radius: 8px; display: inline-flex; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="delete-btn" onclick="deleteProduct('${p.id}')" style="padding: 8px; border-radius: 8px; display: inline-flex; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
                 </td>
             `;
             itemsTbody.appendChild(tr);
