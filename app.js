@@ -1265,7 +1265,7 @@ function renderPOSGrid() {
             btn.style.backgroundColor = p.color || 'var(--primary-color)';
             
             btn.innerHTML = `
-                <span style="font-size: 15px; line-height: 1.2; pointer-events: none;">${p.name}</span>
+                <span style="font-size: 13px; line-height: 1.2; pointer-events: none;">${p.name}</span>
                 <span class="pos-price" style="pointer-events: none;">฿${p.price.toLocaleString()}</span>
             `;
             
