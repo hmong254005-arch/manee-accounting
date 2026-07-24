@@ -1298,6 +1298,8 @@ function renderPOSGrid() {
                 delayOnTouchOnly: true,
                 swap: true, // Use swap mode to prevent grid cascading reflow
                 swapClass: 'highlight', // Class applied to swap target
+                forceFallback: true, // Fix native HTML5 drag ghost positioning on mobile
+                fallbackOnBody: true,
                 onEnd: function() {
                     const btns = grid.querySelectorAll('.pos-btn');
                     const catSort = JSON.parse(localStorage.getItem('posItemSortOrder') || '{}');
@@ -1315,6 +1317,8 @@ function renderPOSGrid() {
             delay: 250,
             delayOnTouchOnly: true,
             handle: '.pos-category-title',
+            forceFallback: true, // Fix native HTML5 drag ghost positioning on mobile
+            fallbackOnBody: true,
             onEnd: function() {
                 const sections = gridContainer.querySelectorAll('.pos-category-section');
                 const newOrder = Array.from(sections).map(sec => sec.dataset.cat);
