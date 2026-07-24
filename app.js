@@ -1215,10 +1215,36 @@ function renderPOSGrid() {
         grouped[cat].push(p);
     });
 
+    // Sort categories
+    let catOrder = JSON.parse(localStorage.getItem('posCategorySortOrder')) || [];
+    const cats = Object.keys(grouped).sort((a, b) => {
+        let ia = catOrder.indexOf(a);
+        let ib = catOrder.indexOf(b);
+        if (ia === -1) ia = 999;
+        if (ib === -1) ib = 999;
+        return ia - ib;
+    });
+
+    const posItemSortOrder = JSON.parse(localStorage.getItem('posItemSortOrder') || '{}');
+
     // Render each category
-    for (const [cat, items] of Object.entries(grouped)) {
+    for (const cat of cats) {
+        const items = grouped[cat];
+        
+        // Sort items within category
+        if (posItemSortOrder[cat]) {
+            items.sort((a, b) => {
+                let ia = posItemSortOrder[cat].indexOf(a.id);
+                let ib = posItemSortOrder[cat].indexOf(b.id);
+                if (ia === -1) ia = 999;
+                if (ib === -1) ib = 999;
+                return ia - ib;
+            });
+        }
+
         const section = document.createElement('details');
         section.className = 'pos-category-section filter-accordion';
+        section.dataset.cat = cat;
         section.open = true; // Open by default
         
         const title = document.createElement('summary');
@@ -1235,11 +1261,12 @@ function renderPOSGrid() {
         items.forEach(p => {
             const btn = document.createElement('button');
             btn.className = 'pos-btn';
+            btn.dataset.id = p.id;
             btn.style.backgroundColor = p.color || 'var(--primary-color)';
             
             btn.innerHTML = `
-                <span style="font-size: 15px; line-height: 1.2;">${p.name}</span>
-                <span class="pos-price">฿${p.price.toLocaleString()}</span>
+                <span style="font-size: 15px; line-height: 1.2; pointer-events: none;">${p.name}</span>
+                <span class="pos-price" style="pointer-events: none;">฿${p.price.toLocaleString()}</span>
             `;
             
             btn.addEventListener('click', async () => {
@@ -1262,6 +1289,36 @@ function renderPOSGrid() {
         
         section.appendChild(grid);
         gridContainer.appendChild(section);
+
+        // Make items sortable
+        if (window.Sortable) {
+            Sortable.create(grid, {
+                animation: 150,
+                delay: 250,
+                delayOnTouchOnly: true,
+                onEnd: function() {
+                    const btns = grid.querySelectorAll('.pos-btn');
+                    const catSort = JSON.parse(localStorage.getItem('posItemSortOrder') || '{}');
+                    catSort[cat] = Array.from(btns).map(b => b.dataset.id);
+                    localStorage.setItem('posItemSortOrder', JSON.stringify(catSort));
+                }
+            });
+        }
+    }
+
+    // Make categories sortable
+    if (window.Sortable) {
+        Sortable.create(gridContainer, {
+            animation: 150,
+            delay: 250,
+            delayOnTouchOnly: true,
+            handle: '.pos-category-title',
+            onEnd: function() {
+                const sections = gridContainer.querySelectorAll('.pos-category-section');
+                const newOrder = Array.from(sections).map(sec => sec.dataset.cat);
+                localStorage.setItem('posCategorySortOrder', JSON.stringify(newOrder));
+            }
+        });
     }
 }
 
