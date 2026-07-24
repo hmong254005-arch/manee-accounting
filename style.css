@@ -1099,10 +1099,15 @@ tr:last-child td {
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         border: 1px solid var(--border-color);
         background: white;
+        overflow-x: auto;
     }
     
     #view-manage-menu table {
-        font-size: 14px;
+        font-size: 13px; /* make text smaller as requested */
+    }
+
+    #view-manage-menu th, #view-manage-menu td {
+        padding: 8px 6px;
     }
     
     /* Make calendar cells slightly larger */
