@@ -571,8 +571,14 @@ async function handleSendMessage() {
         // Remove loading
         document.getElementById(loadingId).remove();
         
-        // Show AI reply (using marked to parse markdown)
-        addChatMessage("มานี", marked.parse(response.reply), "ai", true);
+        // Show AI reply (split by ||| for multiple bubbles)
+        const replies = response.reply.split('|||');
+        for (let r of replies) {
+            const cleanReply = r.trim();
+            if (cleanReply) {
+                addChatMessage("มานี", marked.parse(cleanReply), "ai", true);
+            }
+        }
 
         // Save new transactions
         if (response.transactions && response.transactions.length > 0) {
