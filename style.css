@@ -713,7 +713,7 @@ tr:last-child td {
 }
 
 .pos-container {
-    padding: 10px 0;
+    padding: 10px 16px;
 }
 
 .pos-grid {
@@ -727,12 +727,12 @@ tr:last-child td {
 }
 
 .pos-category-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 12px;
     color: var(--text-primary);
     border-bottom: 2px solid var(--border-color);
-    padding-bottom: 6px;
+    padding-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
