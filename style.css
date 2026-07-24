@@ -713,7 +713,14 @@ tr:last-child td {
 }
 
 .pos-container {
-    padding: 10px 16px 120px 16px;
+    padding: 10px 16px;
+}
+
+.pos-container::after {
+    content: "";
+    display: block;
+    height: 120px;
+    width: 100%;
 }
 
 .pos-grid {
