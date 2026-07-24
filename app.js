@@ -1234,8 +1234,8 @@ function renderPOSGrid() {
         // Sort items within category
         if (posItemSortOrder[cat]) {
             items.sort((a, b) => {
-                let ia = posItemSortOrder[cat].indexOf(a.id);
-                let ib = posItemSortOrder[cat].indexOf(b.id);
+                let ia = posItemSortOrder[cat].indexOf(a.id.toString());
+                let ib = posItemSortOrder[cat].indexOf(b.id.toString());
                 if (ia === -1) ia = 999;
                 if (ib === -1) ib = 999;
                 return ia - ib;
@@ -1296,6 +1296,8 @@ function renderPOSGrid() {
                 animation: 150,
                 delay: 250,
                 delayOnTouchOnly: true,
+                swap: true, // Use swap mode to prevent grid cascading reflow
+                swapClass: 'highlight', // Class applied to swap target
                 onEnd: function() {
                     const btns = grid.querySelectorAll('.pos-btn');
                     const catSort = JSON.parse(localStorage.getItem('posItemSortOrder') || '{}');
