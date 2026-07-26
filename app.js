@@ -31,15 +31,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const user = await window.dbAPI.getCurrentUser();
         if (user) {
-            // Logged in
-            document.getElementById('auth-modal').style.display = 'none';
-            await loadTransactions();
-            await loadProducts();
-            setupPOSDailySummary();
-            generateInsight();
+            // Check if user has completed store onboarding
+            if (!user.user_metadata || !user.user_metadata.store_name) {
+                // Show onboarding modal
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('store-setup-modal').style.display = 'flex';
+                
+                // Handle onboarding save
+                const saveBtn = document.getElementById('btn-save-store-name');
+                const storeInput = document.getElementById('setup-store-name');
+                if (saveBtn && storeInput) {
+                    saveBtn.onclick = async () => {
+                        const storeName = storeInput.value.trim();
+                        if (!storeName) {
+                            alert('กรุณากรอกชื่อร้านค้าครับ');
+                            return;
+                        }
+                        
+                        saveBtn.disabled = true;
+                        saveBtn.innerHTML = 'กำลังบันทึก...';
+                        
+                        try {
+                            await window.dbAPI.updateProfile({ store_name: storeName });
+                            document.getElementById('store-setup-modal').style.display = 'none';
+                            
+                            // Load app data
+                            await loadTransactions();
+                            await loadProducts();
+                            setupPOSDailySummary();
+                            generateInsight();
+                            showToast("บันทึกข้อมูลเรียบร้อย เข้าสู่ระบบสำเร็จ!");
+                        } catch (err) {
+                            console.error(err);
+                            alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = 'บันทึกและเริ่มต้นใช้งาน';
+                        }
+                    };
+                }
+            } else {
+                // Already has store name, login normally
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('store-setup-modal').style.display = 'none';
+                const titleEl = document.querySelector('.mobile-top-title');
+                if(titleEl) titleEl.innerText = user.user_metadata.store_name || "มานี บัญชี";
+                
+                await loadTransactions();
+                await loadProducts();
+                setupPOSDailySummary();
+                generateInsight();
+            }
         } else {
             // Not logged in
             document.getElementById('auth-modal').style.display = 'flex';
+            document.getElementById('store-setup-modal').style.display = 'none';
         }
     } catch (e) {
         console.error("Failed to initialize app", e);
@@ -82,12 +127,26 @@ function setupAuthUI() {
     };
     
     const handleLoginSuccess = async () => {
-        authModal.style.display = 'none';
-        await loadTransactions();
-        await loadProducts();
-        setupPOSDailySummary();
-        generateInsight();
-        showToast("เข้าสู่ระบบสำเร็จ!");
+        const user = await window.dbAPI.getCurrentUser();
+        
+        if (!user.user_metadata || !user.user_metadata.store_name) {
+            // Show onboarding
+            authModal.style.display = 'none';
+            document.getElementById('store-setup-modal').style.display = 'flex';
+            
+            // Note: The click handler for saving store_name is already set up in DOMContentLoaded init block above.
+        } else {
+            // Proceed normally
+            authModal.style.display = 'none';
+            const titleEl = document.querySelector('.mobile-top-title');
+            if(titleEl) titleEl.innerText = user.user_metadata.store_name || "มานี บัญชี";
+            
+            await loadTransactions();
+            await loadProducts();
+            setupPOSDailySummary();
+            generateInsight();
+            showToast("เข้าสู่ระบบสำเร็จ!");
+        }
     };
     
     // Guest Login
@@ -97,10 +156,40 @@ function setupAuthUI() {
             showLoading();
             try {
                 await window.dbAPI.signInAnonymously();
+                // We set a fake metadata store_name for guests so it doesn't prompt them, or let them set it?
+                // Let's prompt them too, it looks professional!
                 await handleLoginSuccess();
             } catch (e) {
                 hideLoading();
                 alert("เข้าใช้งานทันทีไม่สำเร็จ: " + e.message);
+            }
+        });
+    }
+
+    // LINE Login
+    const lineBtn = document.getElementById('btn-login-line');
+    if (lineBtn) {
+        lineBtn.addEventListener('click', async () => {
+            showLoading();
+            try {
+                await window.dbAPI.signInWithProvider('line');
+            } catch (e) {
+                hideLoading();
+                alert("เข้าสู่ระบบด้วย LINE ไม่สำเร็จ: " + e.message);
+            }
+        });
+    }
+
+    // Facebook Login
+    const fbBtn = document.getElementById('btn-login-facebook');
+    if (fbBtn) {
+        fbBtn.addEventListener('click', async () => {
+            showLoading();
+            try {
+                await window.dbAPI.signInWithProvider('facebook');
+            } catch (e) {
+                hideLoading();
+                alert("เข้าสู่ระบบด้วย Facebook ไม่สำเร็จ: " + e.message);
             }
         });
     }

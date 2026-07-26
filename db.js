@@ -67,6 +67,28 @@ async function signInWithEmail(email, password) {
     return data.user;
 }
 
+async function signInWithProvider(providerName) {
+    // providerName is 'line' or 'facebook'
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: providerName,
+        options: {
+            redirectTo: window.location.origin + window.location.pathname
+        }
+    });
+    if (error) throw error;
+    return data;
+}
+
+async function updateProfile(metadata) {
+    if (!currentUser) throw new Error("Please login first");
+    const { data, error } = await supabaseClient.auth.updateUser({
+        data: metadata
+    });
+    if (error) throw error;
+    currentUser = data.user;
+    return data.user;
+}
+
 async function signInAnonymously() {
     const { data, error } = await supabaseClient.auth.signInAnonymously();
     if (error) throw error;
@@ -249,6 +271,8 @@ window.dbAPI = {
     getCurrentUser,
     signUpWithEmail,
     signInWithEmail,
+    signInWithProvider,
+    updateProfile,
     signInAnonymously,
     signOut,
     addTransaction,
