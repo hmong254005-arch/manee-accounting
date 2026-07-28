@@ -72,7 +72,7 @@ async function processUserMessage(message, apiKey, transactions = [], base64Imag
         }
     });
 
-    // Calculate daily summaries for the prompt
+    // Calculate daily summaries for the prompt (Last 60 days)
     const dailySummaries = {};
     sortedTx.forEach(t => {
         const d = new Date(t.date);
@@ -80,12 +80,18 @@ async function processUserMessage(message, apiKey, transactions = [], base64Imag
         if (!dailySummaries[dateStr]) {
             dailySummaries[dateStr] = {
                 storeIncome: 0, storeExpense: 0,
-                houseIncome: 0, houseExpense: 0
+                houseIncome: 0, houseExpense: 0,
+                items: {}, totalItems: 0
             };
         }
         const amt = Number(t.amount);
         if (t.category === 'store') {
-            if (t.type === 'income') dailySummaries[dateStr].storeIncome += amt;
+            if (t.type === 'income') {
+                dailySummaries[dateStr].storeIncome += amt;
+                const name = t.detail.trim();
+                dailySummaries[dateStr].items[name] = (dailySummaries[dateStr].items[name] || 0) + 1;
+                dailySummaries[dateStr].totalItems++;
+            }
             else dailySummaries[dateStr].storeExpense += amt;
         } else {
             if (t.type === 'income') dailySummaries[dateStr].houseIncome += amt;
@@ -93,41 +99,21 @@ async function processUserMessage(message, apiKey, transactions = [], base64Imag
         }
     });
 
-    const dailySummaryText = Object.keys(dailySummaries).slice(0, 30).map(date => {
+    const dailySummaryText = Object.keys(dailySummaries).slice(0, 60).map(date => {
         const s = dailySummaries[date];
-        const storeNet = s.storeIncome - s.storeExpense;
-        const houseNet = s.houseIncome - s.houseExpense;
-        const totalInc = s.storeIncome + s.houseIncome;
-        const totalExp = s.storeExpense + s.houseExpense;
-        const totalNet = storeNet + houseNet;
-        return `- วันที่ ${date}:
-  ร้านค้า: รายรับ ${s.storeIncome}, รายจ่าย ${s.storeExpense}, สุทธิ ${storeNet}
-  ครัวเรือน: รายรับ ${s.houseIncome}, รายจ่าย ${s.houseExpense}, สุทธิ ${houseNet}
-  รวมสุทธิทั้งวัน: รายรับ ${totalInc}, รายจ่าย ${totalExp}, สุทธิ ${totalNet}`;
+        let itemsStr = "ไม่มีการขาย";
+        if (s.totalItems > 0) {
+            // Get top 5 items for brevity in summary, full details are in allTxText
+            const topItems = Object.entries(s.items).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            itemsStr = `ขายได้ ${s.totalItems} ชิ้น (` + topItems.map(([name, count]) => `${name}=${count}`).join(', ') + `)`;
+        }
+        return `- วันที่ ${date}: ร้านค้า(รับ ${s.storeIncome}, จ่าย ${s.storeExpense}) | ครัวเรือน(รับ ${s.houseIncome}, จ่าย ${s.houseExpense}) | สินค้า: ${itemsStr}`;
     }).join('\n');
 
-    const recentTx = sortedTx.slice(0, 50).map(t => 
-        `- ${new Date(t.date).toLocaleString('th-TH')}: [${t.category === 'store' ? 'ร้านค้า' : 'ครัวเรือน'}] ${t.type === 'income' ? 'รายรับ' : 'รายจ่าย'} ${t.amount} บาท (${t.detail})`
+    // Include up to 1000 detailed transactions for deep analysis
+    const allTxText = sortedTx.slice(0, 1000).map(t => 
+        `- ${new Date(t.date).toLocaleDateString('th-TH')} ${new Date(t.date).toLocaleTimeString('th-TH').slice(0,5)}: [${t.category === 'store' ? 'ร้านค้า' : 'ครัวเรือน'}] ${t.type === 'income' ? 'รายรับ' : 'รายจ่าย'} ${t.amount} บ. (${t.detail})`
     ).join("\n");
-
-    // Group today's items sold to help AI answer "how many sold"
-    const todayItemsCount = {};
-    let todayItemsTotal = 0;
-    sortedTx.forEach(t => {
-        const txDate = new Date(t.date);
-        if (txDate >= todayStart && t.category === 'store' && t.type === 'income') {
-            const name = t.detail.trim();
-            todayItemsCount[name] = (todayItemsCount[name] || 0) + 1;
-            todayItemsTotal++;
-        }
-    });
-    
-    const todayItemsList = Object.entries(todayItemsCount)
-        .map(([name, count]) => `${name} ${count} รายการ (แก้ว/ชิ้น)`)
-        .join(', ');
-    const todayItemsText = todayItemsTotal > 0 
-        ? `ข้อมูลการขายสินค้าวันนี้: ขายได้ทั้งหมด ${todayItemsTotal} รายการ ได้แก่ ${todayItemsList}` 
-        : `ข้อมูลการขายสินค้าวันนี้: ยังไม่มีการขายสินค้า`;
 
     const systemPrompt = `
 คุณคือ "มานี" ผู้ช่วย AI อัจฉริยะด้านการเงินและบัญชีของร้านค้าไทย
@@ -151,11 +137,11 @@ async function processUserMessage(message, apiKey, transactions = [], base64Imag
 🔴 รายจ่าย: X บาท
 💰 คงเหลือ: X บาท
 
-[ข้อมูลรายละเอียดการขายวันนี้] (ใช้ตอบคำถามว่า "วันนี้ขายได้กี่แก้ว" หรือ "วันนี้ขายอะไรไปบ้าง")
-${todayItemsText}
+[ข้อมูลสถิติรายวันย้อนหลัง (ปฏิทิน)] (ใช้ตอบคำถามยอดรวมของวันก่อนๆ หรือเปรียบเทียบสถิติ)
+${dailySummaryText || 'ยังไม่มีข้อมูล'}
 
-[ประวัติรายการล่าสุด] (ไว้อ้างอิงเท่านั้น ห้ามสรุปซ้ำ)
-${recentTx}
+[ประวัติรายการบัญชีทั้งหมด (ดิบ)] (ใช้วิเคราะห์เจาะลึก เช่น ใครซื้ออะไรบ้าง, สั่งกี่แก้ว, หาสินค้าขายดี)
+${allTxText || 'ยังไม่มีรายการ'}
 
 ให้ตอบกลับเป็น JSON format เท่านั้น ห้ามมีข้อความอื่นปน
 {
@@ -173,7 +159,7 @@ ${recentTx}
 
 กฎที่ต้องปฏิบัติตามอย่างเคร่งครัด:
 1. การจดบัญชีหลายรายการ: ถ้าผู้ใช้บอกมาหลายรายการ (เช่น ขายกาแฟ 8000, ซื้อนม 400, กินข้าว 100) ให้แยกวิเคราะห์และใส่ใน array "transactions" ให้ครบทุกรายการ **ห้ามตกหล่นเด็ดขาด** จำนวนรายการในข้อความตอบกลับต้องตรงกับจำนวน object ใน array
-2. การตอบคำถามเจาะจง (สำคัญที่สุด!): **ถ้าผู้ใช้ถามคำถามเฉพาะเจาะจง (เช่น "วันนี้ขายได้กี่แก้ว", "ใครซื้อบ้าง", "ขายอะไรดีสุด") ให้ใช้ข้อมูลจาก [ข้อมูลรายละเอียดการขายวันนี้] หรือ [ประวัติรายการล่าสุด] ตอบเป็น "ข้อความบรรยายสั้นๆ" ห้ามตอบเป็นตารางสรุปยอดรวมเด็ดขาด**
+2. การตอบคำถามเชิงวิเคราะห์ (สำคัญมาก!): **ถ้าผู้ใช้ถามสถิติย้อนหลัง (เช่น "วันที่ 20-25 ขายได้กี่แก้ว", "สัปดาห์ที่แล้วขายอะไรดีสุด") ให้ใช้ข้อมูลจาก [ประวัติรายการบัญชีทั้งหมด (ดิบ)] และ [ข้อมูลสถิติรายวันย้อนหลัง (ปฏิทิน)] มาคำนวณและวิเคราะห์อย่างละเอียด แล้วตอบเป็นข้อความบรรยายสั้นๆ พร้อมคำแนะนำ ห้ามตอบเป็นตารางสรุปยอดรวมเด็ดขาด**
 3. การตอบกลับเมื่อจดบันทึกภาพรวม (ใช้ตารางเฉพาะตอนผู้ใช้ขอดูสรุปยอดรวมเท่านั้น):
    - **กรณีสรุปยอดรวมประจำวัน/ภาพรวม:**
      | ประเภทบัญชี | รายรับ (บาท) | รายจ่าย (บาท) | คงเหลือสุทธิ (บาท) | สถานะ |
@@ -186,7 +172,7 @@ ${recentTx}
      | --- | --- | --- | --- | --- | --- |
      | [วันที่] | [ชื่อรายการ] | [ตัวเลข หรือ -] | [ตัวเลข หรือ -] | [ร้านค้า/ครัวเรือน] | [สั้นๆ] |
 4. การวิเคราะห์ประเภท: ถ้าไม่แน่ใจ ให้วิเคราะห์จากบริบท (ของขาย/วัตถุดิบ = store (ร้านค้า), ของกิน/ของใช้ส่วนตัว = house (ครัวเรือน))
-5. บทบาทที่ปรึกษาและเลขาอัจฉริยะ: หากผู้ใช้ขอคำแนะนำ ให้วิเคราะห์ข้อมูลจากประวัติรายการ ชี้จุดรั่วไหลทางการเงิน ให้คำแนะนำที่เป็นรูปธรรม ใช้ภาษาที่ให้กำลังใจ เป็นมืออาชีพ
+5. บทบาทที่ปรึกษาและเลขาอัจฉริยะ: หากผู้ใช้ขอคำแนะนำ ให้วิเคราะห์ข้อมูลจากประวัติรายการทั้งหมด ชี้จุดแข็ง จุดรั่วไหล ให้คำแนะนำที่เป็นรูปธรรม ใช้ภาษาที่ให้กำลังใจ เป็นมืออาชีพ
 [คำแนะนำพิเศษสำหรับรูปภาพสลิป/ใบเสร็จ]
 ถ้าผู้ใช้ส่งรูปภาพมาด้วย:
 - ให้อ่านข้อมูลจากรูปภาพ เช่น วันที่ ชื่อร้าน รายการสินค้า ยอดเงิน
