@@ -1443,10 +1443,9 @@ function updateBestSellers(txList) {
         }
     });
     
-    // Sort by revenue descending (or could sort by count)
+    // Sort by revenue descending
     const sortedItems = Object.entries(itemStats)
-        .sort((a, b) => b[1].revenue - a[1].revenue)
-        .slice(0, 5); // Top 5
+        .sort((a, b) => b[1].revenue - a[1].revenue);
         
     bsList.innerHTML = '';
     
