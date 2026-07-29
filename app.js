@@ -1470,24 +1470,45 @@ function updateBestSellers(txList) {
     });
 }
 
+function getFilteredPOSTransactions() {
+    const periodSelect = document.getElementById('pos-period-select');
+    const period = periodSelect ? periodSelect.value : 'today';
+    
+    if (period === 'all') return transactions;
+    
+    const now = new Date();
+    let startDate = new Date();
+    
+    if (period === 'today') {
+        startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'week') {
+        startDate.setDate(now.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'month') {
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'year') {
+        startDate.setMonth(0, 1);
+        startDate.setHours(0, 0, 0, 0);
+    }
+    
+    return transactions.filter(tx => new Date(tx.date) >= startDate);
+}
+
 function setupPOSCalendar() {
-    const posDatePicker = document.getElementById('pos-date-picker');
-    if (posDatePicker) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        posDatePicker.value = `${yyyy}-${mm}-${dd}`;
-        
-        posDatePicker.addEventListener('change', () => {
+    const posPeriodSelect = document.getElementById('pos-period-select');
+    if (posPeriodSelect) {
+        posPeriodSelect.addEventListener('change', () => {
             const titleEl = document.getElementById('pos-summary-title');
             if (titleEl) {
-                if (posDatePicker.value === `${yyyy}-${mm}-${dd}`) {
-                    titleEl.innerText = "สรุปยอดขายหน้าร้านวันนี้";
-                } else {
-                    const d = new Date(posDatePicker.value);
-                    titleEl.innerText = `สรุปยอดขายหน้าร้าน (${d.toLocaleDateString('th-TH')})`;
-                }
+                const textMap = {
+                    'today': 'สรุปยอดขายหน้าร้านวันนี้',
+                    'week': 'สรุปยอดขายหน้าร้าน (สัปดาห์นี้)',
+                    'month': 'สรุปยอดขายหน้าร้าน (เดือนนี้)',
+                    'year': 'สรุปยอดขายหน้าร้าน (ปีนี้)',
+                    'all': 'สรุปยอดขายหน้าร้าน (ทั้งหมด)'
+                };
+                titleEl.innerText = textMap[posPeriodSelect.value] || 'สรุปยอดขายหน้าร้าน';
             }
             renderPOSStats();
         });
@@ -1499,33 +1520,19 @@ function renderPOSStats() {
     const totalEl = document.getElementById('pos-today-total');
     if (!statsList || !totalEl) return;
     
-    // Get target date from picker or default to today
-    let targetDate = new Date();
-    const datePicker = document.getElementById('pos-date-picker');
-    if (datePicker && datePicker.value) {
-        targetDate = new Date(datePicker.value);
-    }
-    targetDate.setHours(0, 0, 0, 0);
-    
-    const nextDay = new Date(targetDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    
     let totalSales = 0;
     let totalItems = 0;
     const itemStats = {};
-    const posFilteredTx = [];
     
-    transactions.forEach(tx => {
-        const txDate = new Date(tx.date);
-        if (txDate >= targetDate && txDate < nextDay) {
-            posFilteredTx.push(tx);
-            if (tx.category === 'store' && tx.type === 'income') {
-                if (!itemStats[tx.detail]) itemStats[tx.detail] = { count: 0, revenue: 0 };
-                itemStats[tx.detail].count += 1;
-                itemStats[tx.detail].revenue += tx.amount;
-                totalSales += tx.amount;
-                totalItems += 1;
-            }
+    const posFilteredTx = getFilteredPOSTransactions();
+    
+    posFilteredTx.forEach(tx => {
+        if (tx.category === 'store' && tx.type === 'income') {
+            if (!itemStats[tx.detail]) itemStats[tx.detail] = { count: 0, revenue: 0 };
+            itemStats[tx.detail].count += 1;
+            itemStats[tx.detail].revenue += tx.amount;
+            totalSales += tx.amount;
+            totalItems += 1;
         }
     });
     

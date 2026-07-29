@@ -465,7 +465,13 @@
                 <header class="view-header">
                     <h2>หน้าร้าน (POS)</h2>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="date" id="pos-date-picker" style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-family: 'Inter', sans-serif; color: var(--text-primary); font-size: 14px;">
+                        <select class="period-select" id="pos-period-select" style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; font-family: 'Inter', sans-serif;">
+                            <option value="today" selected>วันนี้</option>
+                            <option value="week">สัปดาห์นี้</option>
+                            <option value="month">เดือนนี้</option>
+                            <option value="year">ปีนี้</option>
+                            <option value="all">ทั้งหมด</option>
+                        </select>
                         <button id="close-shop-btn" class="btn btn-primary" style="background-color: #f59e0b; border: none; font-weight: 600;">ปิดยอด</button>
                     </div>
                 </header>
@@ -675,7 +681,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="db.js?v=12"></script>
     <script src="ai.js?v=13"></script>
-    <script src="app.js?v=35"></script>
+    <script src="app.js?v=36"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
