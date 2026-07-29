@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     safeSetup('setupProducts', setupProducts);
     safeSetup('setupDashboardFilter', setupDashboardFilter);
     safeSetup('setupCalendar', setupCalendar);
+    safeSetup('setupPOSCalendar', setupPOSCalendar);
     
     document.getElementById('refresh-insight-btn')?.addEventListener('click', generateInsight);
 
@@ -938,9 +939,6 @@ function updateDashboard() {
     safeSetText('summary-total-income', `฿${totalIncome.toLocaleString()}`);
     safeSetText('summary-net-balance', `฿${netBalance.toLocaleString()}`);
 
-    // Update Best Sellers with filtered data
-    updateBestSellers(filteredTx);
-
     // Update Chart
     const ctx = document.getElementById('mainChart').getContext('2d');
     
@@ -1472,36 +1470,74 @@ function updateBestSellers(txList) {
     });
 }
 
+function setupPOSCalendar() {
+    const posDatePicker = document.getElementById('pos-date-picker');
+    if (posDatePicker) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        posDatePicker.value = `${yyyy}-${mm}-${dd}`;
+        
+        posDatePicker.addEventListener('change', () => {
+            const titleEl = document.getElementById('pos-summary-title');
+            if (titleEl) {
+                if (posDatePicker.value === `${yyyy}-${mm}-${dd}`) {
+                    titleEl.innerText = "สรุปยอดขายหน้าร้านวันนี้";
+                } else {
+                    const d = new Date(posDatePicker.value);
+                    titleEl.innerText = `สรุปยอดขายหน้าร้าน (${d.toLocaleDateString('th-TH')})`;
+                }
+            }
+            renderPOSStats();
+        });
+    }
+}
+
 function renderPOSStats() {
     const statsList = document.getElementById('pos-stats-list');
     const totalEl = document.getElementById('pos-today-total');
     if (!statsList || !totalEl) return;
     
-    // Get today's start date
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get target date from picker or default to today
+    let targetDate = new Date();
+    const datePicker = document.getElementById('pos-date-picker');
+    if (datePicker && datePicker.value) {
+        targetDate = new Date(datePicker.value);
+    }
+    targetDate.setHours(0, 0, 0, 0);
+    
+    const nextDay = new Date(targetDate);
+    nextDay.setDate(nextDay.getDate() + 1);
     
     let totalSales = 0;
     let totalItems = 0;
     const itemStats = {};
+    const posFilteredTx = [];
     
     transactions.forEach(tx => {
         const txDate = new Date(tx.date);
-        if (tx.category === 'store' && tx.type === 'income' && txDate >= today) {
-            if (!itemStats[tx.detail]) itemStats[tx.detail] = { count: 0, revenue: 0 };
-            itemStats[tx.detail].count += 1;
-            itemStats[tx.detail].revenue += tx.amount;
-            totalSales += tx.amount;
-            totalItems += 1;
+        if (txDate >= targetDate && txDate < nextDay) {
+            posFilteredTx.push(tx);
+            if (tx.category === 'store' && tx.type === 'income') {
+                if (!itemStats[tx.detail]) itemStats[tx.detail] = { count: 0, revenue: 0 };
+                itemStats[tx.detail].count += 1;
+                itemStats[tx.detail].revenue += tx.amount;
+                totalSales += tx.amount;
+                totalItems += 1;
+            }
         }
     });
+    
+    // Update both lists to reflect the chosen date
+    updateBestSellers(posFilteredTx);
     
     const sortedItems = Object.entries(itemStats).sort((a, b) => b[1].revenue - a[1].revenue);
     
     statsList.innerHTML = '';
     
     if (sortedItems.length === 0) {
-        statsList.innerHTML = '<p style="color: #64748B; font-size: 14px; text-align: center; padding: 20px 0;">ยังไม่มียอดขายวันนี้</p>';
+        statsList.innerHTML = '<p style="color: #64748B; font-size: 14px; text-align: center; padding: 20px 0;">ยังไม่มียอดขาย</p>';
     } else {
         sortedItems.forEach(item => {
             const name = item[0];
