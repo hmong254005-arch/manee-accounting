@@ -128,6 +128,17 @@ function setupAuthUI() {
     };
     
     const handleLoginSuccess = async () => {
+        // Clear chat history for the new session
+        localStorage.removeItem('manee_chat_history');
+        localStorage.removeItem('manee_chat_date');
+        
+        // Clear the UI if already populated
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            chatMessages.innerHTML = '';
+            chatHistory = [];
+        }
+
         const user = await window.dbAPI.getCurrentUser();
         
         if (!user.user_metadata || !user.user_metadata.store_name) {
@@ -369,6 +380,10 @@ function setupSettings() {
         logoutBtn.addEventListener('click', async () => {
             if (confirm("ต้องการออกจากระบบใช่หรือไม่?")) {
                 try {
+                    // Clear user-specific local data
+                    localStorage.removeItem('manee_chat_history');
+                    localStorage.removeItem('manee_chat_date');
+                    
                     await window.dbAPI.signOut();
                     window.location.reload();
                 } catch (e) {
