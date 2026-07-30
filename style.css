@@ -30,7 +30,7 @@
 
 body {
     font-family: 'Sarabun', 'Inter', sans-serif;
-    background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
     color: var(--text-primary);
     line-height: 1.5;
     height: 100vh;
@@ -990,11 +990,13 @@ tr:last-child td {
         flex-direction: row;
         padding: 0;
         border-right: none;
-        border-top: 1px solid var(--border-color);
+        border-top: var(--glass-border);
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
-        background-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
         margin-left: 0 !important;
     }
@@ -1414,7 +1416,10 @@ tr:last-child td {
         justify-content: space-between;
         align-items: center;
         padding: 10px 16px;
-        background: #ffffff;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: var(--glass-border);
         position: fixed;
         top: 0;
         left: 0;
