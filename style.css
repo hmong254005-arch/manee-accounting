@@ -1174,6 +1174,7 @@ tr:last-child td {
 .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
     text-align: center;
     font-weight: 600;
     color: var(--text-secondary);
@@ -1251,9 +1252,17 @@ tr:last-child td {
 }
 
 @media (max-width: 768px) {
-    .calendar-container { padding: 10px; }
-    .calendar-day { min-height: 60px; padding: 4px; }
-    .calendar-day .day-sales { font-size: 11px; }
+    .calendar-container { padding: 4px; }
+    .calendar-grid, .calendar-weekdays { gap: 4px; }
+    .calendar-weekdays { font-size: 12px; margin-bottom: 8px; }
+    .calendar-day { 
+        min-height: 50px; 
+        padding: 4px; 
+        aspect-ratio: auto;
+        border-radius: 8px;
+    }
+    .calendar-day .day-number { font-size: 12px; margin-bottom: 2px; }
+    .calendar-day .day-sales { font-size: 9.5px; line-height: 1.1; letter-spacing: -0.5px; }
 }
 
 
