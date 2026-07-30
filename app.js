@@ -794,8 +794,13 @@ async function loadTransactions() {
 }
 
 function renderTransactionsTable() {
-    const tbody = document.getElementById('transactions-tbody');
-    tbody.innerHTML = '';
+    const tbodyStoreIncome = document.getElementById('transactions-store-income-tbody');
+    const tbodyStoreExpense = document.getElementById('transactions-store-expense-tbody');
+    const tbodyHouseExpense = document.getElementById('transactions-house-expense-tbody');
+    
+    if (tbodyStoreIncome) tbodyStoreIncome.innerHTML = '';
+    if (tbodyStoreExpense) tbodyStoreExpense.innerHTML = '';
+    if (tbodyHouseExpense) tbodyHouseExpense.innerHTML = '';
 
     const dateFilterValue = document.getElementById('filter-date')?.value;
 
@@ -835,10 +840,9 @@ function renderTransactionsTable() {
     else if (summaryNet < 0) netEl.style.color = 'var(--danger-color)';
     else netEl.style.color = 'var(--text-primary)';
 
-    if (filteredTx.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูลรายการบัญชีในหมวดหมู่นี้</td></tr>';
-        return;
-    }
+    let hasStoreIncome = false;
+    let hasStoreExpense = false;
+    let hasHouseExpense = false;
 
     filteredTx.forEach(tx => {
         const date = new Date(tx.date).toLocaleString('th-TH');
@@ -866,8 +870,32 @@ function renderTransactionsTable() {
                 </button>
             </td>
         `;
-        tbody.appendChild(tr);
+
+        if (tx.category === 'store' && tx.type === 'income') {
+            tbodyStoreIncome?.appendChild(tr);
+            hasStoreIncome = true;
+        } else if (tx.category === 'store' && tx.type === 'expense') {
+            tbodyStoreExpense?.appendChild(tr);
+            hasStoreExpense = true;
+        } else if (tx.category === 'house' && tx.type === 'expense') {
+            tbodyHouseExpense?.appendChild(tr);
+            hasHouseExpense = true;
+        } else {
+            // fallback if anything else (like house income)
+            tbodyStoreIncome?.appendChild(tr);
+            hasStoreIncome = true;
+        }
     });
+
+    if (!hasStoreIncome && tbodyStoreIncome) {
+        tbodyStoreIncome.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    }
+    if (!hasStoreExpense && tbodyStoreExpense) {
+        tbodyStoreExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    }
+    if (!hasHouseExpense && tbodyHouseExpense) {
+        tbodyHouseExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    }
 }
 
 window.deleteTx = async function(id) {
