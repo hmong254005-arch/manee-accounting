@@ -897,42 +897,21 @@ function renderTransactionsTable() {
 
     if (!hasStoreIncome && tbodyStoreIncome) {
         tbodyStoreIncome.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
-    } else if (tbodyStoreIncome) {
-        const trTotal = document.createElement('tr');
-        trTotal.style.backgroundColor = '#f0fdf4';
-        trTotal.innerHTML = `
-            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายรับร้าน:</td>
-            <td style="color:var(--profit-color); font-weight:700; text-align:right;">+฿${sumStoreIncome.toLocaleString()}</td>
-            <td></td>
-        `;
-        tbodyStoreIncome.appendChild(trTotal);
     }
+    const storeIncomeText = document.getElementById('summary-store-income-text');
+    if (storeIncomeText) storeIncomeText.textContent = `(ยอดรวม: +฿${sumStoreIncome.toLocaleString()})`;
 
     if (!hasStoreExpense && tbodyStoreExpense) {
         tbodyStoreExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
-    } else if (tbodyStoreExpense) {
-        const trTotal = document.createElement('tr');
-        trTotal.style.backgroundColor = '#fef2f2';
-        trTotal.innerHTML = `
-            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายจ่ายร้าน:</td>
-            <td style="color:var(--danger-color); font-weight:700; text-align:right;">-฿${sumStoreExpense.toLocaleString()}</td>
-            <td></td>
-        `;
-        tbodyStoreExpense.appendChild(trTotal);
     }
+    const storeExpenseText = document.getElementById('summary-store-expense-text');
+    if (storeExpenseText) storeExpenseText.textContent = `(ยอดรวม: -฿${sumStoreExpense.toLocaleString()})`;
 
     if (!hasHouseExpense && tbodyHouseExpense) {
         tbodyHouseExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
-    } else if (tbodyHouseExpense) {
-        const trTotal = document.createElement('tr');
-        trTotal.style.backgroundColor = '#f8fafc';
-        trTotal.innerHTML = `
-            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายจ่ายครัวเรือน:</td>
-            <td style="color:var(--danger-color); font-weight:700; text-align:right;">-฿${sumHouseExpense.toLocaleString()}</td>
-            <td></td>
-        `;
-        tbodyHouseExpense.appendChild(trTotal);
     }
+    const houseExpenseText = document.getElementById('summary-house-expense-text');
+    if (houseExpenseText) houseExpenseText.textContent = `(ยอดรวม: -฿${sumHouseExpense.toLocaleString()})`;
 }
 
 window.deleteTx = async function(id) {
