@@ -1,22 +1,25 @@
 :root {
-    --bg-color: #F8FAFC;
-    --sidebar-bg: #FFFFFF;
-    --card-bg: #FFFFFF;
-    --text-primary: #1E293B;
-    --text-secondary: #64748B;
-    --primary-color: #3B82F6;
-    --primary-hover: #2563EB;
-    --border-color: #E2E8F0;
-    --profit-color: #10B981;
-    --expense-color: #EF4444;
-    --income-color: #06B6D4;
-    --success-color: #22C55E;
-    --warning-color: #F59E0B;
-    --danger-color: #EF4444;
-    --ai-bg: #EFF6FF;
-    --user-bg: #3B82F6;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --bg-color: #f1f5f9;
+    --sidebar-bg: rgba(255, 255, 255, 0.75);
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --primary-color: #4f46e5;
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --primary-hover: #4338ca;
+    --border-color: rgba(255, 255, 255, 0.5);
+    --profit-color: #059669;
+    --expense-color: #e11d48;
+    --income-color: #0ea5e9;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --ai-bg: rgba(238, 242, 255, 0.8);
+    --user-bg: #4f46e5;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 * {
@@ -27,7 +30,7 @@
 
 body {
     font-family: 'Sarabun', 'Inter', sans-serif;
-    background-color: var(--bg-color);
+    background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
     color: var(--text-primary);
     line-height: 1.5;
     height: 100vh;
@@ -55,12 +58,15 @@ body {
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: var(--glass-border);
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 16px;
     width: 400px;
     max-width: 90%;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-glass);
     position: relative;
 }
 
@@ -112,13 +118,16 @@ body {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background: var(--primary-gradient);
     color: white;
     width: 100%;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover);
+    background: var(--primary-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
 /* Layout */
@@ -130,7 +139,9 @@ body {
 .sidebar {
     width: 260px;
     background-color: var(--sidebar-bg);
-    border-right: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: var(--glass-border);
     display: flex;
     flex-direction: column;
     padding: 24px 16px;
@@ -329,25 +340,25 @@ body {
 
 /* Specific Card Gradients & Colors */
 .net-card {
-    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    background: linear-gradient(135deg, rgba(224, 231, 255, 0.7) 0%, rgba(199, 210, 254, 0.7) 100%);
 }
 .net-card .card-icon { color: #4338ca; }
 .net-card .amount { color: #3730a3; }
 
 .profit-card {
-    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    background: linear-gradient(135deg, rgba(220, 252, 231, 0.7) 0%, rgba(187, 247, 208, 0.7) 100%);
 }
 .profit-card .card-icon { color: #15803d; }
 .profit-card .amount { color: #166534; }
 
 .store-income-card {
-    background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+    background: linear-gradient(135deg, rgba(254, 240, 138, 0.7) 0%, rgba(253, 224, 71, 0.7) 100%);
 }
 .store-income-card .card-icon { color: #a16207; }
 .store-income-card .amount { color: #854d0e; }
 
 .expense-card {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    background: linear-gradient(135deg, rgba(254, 226, 226, 0.7) 0%, rgba(254, 202, 202, 0.7) 100%);
 }
 .expense-card .card-icon { color: #b91c1c; }
 .expense-card .amount { color: #991b1b; }
