@@ -844,6 +844,10 @@ function renderTransactionsTable() {
     let hasStoreExpense = false;
     let hasHouseExpense = false;
 
+    let sumStoreIncome = 0;
+    let sumStoreExpense = 0;
+    let sumHouseExpense = 0;
+
     filteredTx.forEach(tx => {
         const date = new Date(tx.date).toLocaleString('th-TH');
         const catBadge = tx.category === 'store' 
@@ -874,27 +878,60 @@ function renderTransactionsTable() {
         if (tx.category === 'store' && tx.type === 'income') {
             tbodyStoreIncome?.appendChild(tr);
             hasStoreIncome = true;
+            sumStoreIncome += tx.amount;
         } else if (tx.category === 'store' && tx.type === 'expense') {
             tbodyStoreExpense?.appendChild(tr);
             hasStoreExpense = true;
+            sumStoreExpense += tx.amount;
         } else if (tx.category === 'house' && tx.type === 'expense') {
             tbodyHouseExpense?.appendChild(tr);
             hasHouseExpense = true;
+            sumHouseExpense += tx.amount;
         } else {
             // fallback if anything else (like house income)
             tbodyStoreIncome?.appendChild(tr);
             hasStoreIncome = true;
+            sumStoreIncome += tx.amount;
         }
     });
 
     if (!hasStoreIncome && tbodyStoreIncome) {
         tbodyStoreIncome.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    } else if (tbodyStoreIncome) {
+        const trTotal = document.createElement('tr');
+        trTotal.style.backgroundColor = '#f0fdf4';
+        trTotal.innerHTML = `
+            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายรับร้าน:</td>
+            <td style="color:var(--profit-color); font-weight:700; text-align:right;">+฿${sumStoreIncome.toLocaleString()}</td>
+            <td></td>
+        `;
+        tbodyStoreIncome.appendChild(trTotal);
     }
+
     if (!hasStoreExpense && tbodyStoreExpense) {
         tbodyStoreExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    } else if (tbodyStoreExpense) {
+        const trTotal = document.createElement('tr');
+        trTotal.style.backgroundColor = '#fef2f2';
+        trTotal.innerHTML = `
+            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายจ่ายร้าน:</td>
+            <td style="color:var(--danger-color); font-weight:700; text-align:right;">-฿${sumStoreExpense.toLocaleString()}</td>
+            <td></td>
+        `;
+        tbodyStoreExpense.appendChild(trTotal);
     }
+
     if (!hasHouseExpense && tbodyHouseExpense) {
         tbodyHouseExpense.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #64748B;">ยังไม่มีข้อมูล</td></tr>';
+    } else if (tbodyHouseExpense) {
+        const trTotal = document.createElement('tr');
+        trTotal.style.backgroundColor = '#f8fafc';
+        trTotal.innerHTML = `
+            <td colspan="4" style="text-align:right; font-weight:700;">รวมยอดรายจ่ายครัวเรือน:</td>
+            <td style="color:var(--danger-color); font-weight:700; text-align:right;">-฿${sumHouseExpense.toLocaleString()}</td>
+            <td></td>
+        `;
+        tbodyHouseExpense.appendChild(trTotal);
     }
 }
 
