@@ -270,7 +270,7 @@ function setupAuthUI() {
         lineBtn.addEventListener('click', async () => {
             showLoading();
             try {
-                await window.dbAPI.signInWithProvider('custom:line');
+                await window.dbAPI.signInWithProvider('line');
             } catch (e) {
                 hideLoading();
                 alert("เข้าสู่ระบบด้วย LINE ไม่สำเร็จ: " + e.message);
