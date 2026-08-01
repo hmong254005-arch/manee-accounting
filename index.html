@@ -144,6 +144,28 @@
         </div>
     </div>
 
+    <!-- Subscription Payment Modal -->
+    <div id="subscription-modal" class="modal" style="z-index: 10001;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h2 style="margin-bottom: 12px; color: var(--primary-color);">ต่ออายุการใช้งาน 💎</h2>
+            <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: 14px;">ใช้งานแอปได้แบบไร้ขีดจำกัด เพียง 199 บาท/เดือน</p>
+            
+            <div style="background: #f1f5f9; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                <p style="font-weight: 600; margin-bottom: 8px;">ธนาคารกสิกรไทย</p>
+                <p style="font-size: 20px; letter-spacing: 2px; color: var(--text-primary); font-family: monospace; margin-bottom: 8px;">123-4-56789-0</p>
+                <p style="font-size: 14px; color: var(--text-secondary);">ชื่อบัญชี: บจก. มานี บัญชี</p>
+            </div>
+            
+            <div class="form-group" style="text-align: left;">
+                <label for="slip-upload-input">แนบสลิปโอนเงิน (199 บาท)</label>
+                <input type="file" id="slip-upload-input" accept="image/*" class="input-field" style="padding: 10px;">
+            </div>
+            
+            <button id="btn-submit-slip" class="btn btn-primary" style="width: 100%; margin-top: 10px;">แจ้งโอนเงิน</button>
+            <button id="btn-close-sub-modal" class="btn" style="width: 100%; margin-top: 10px; background: transparent; color: var(--text-secondary);">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Mobile Top Bar (Hidden on Desktop) -->
         <div class="mobile-top-bar" id="mobile-top-bar">
@@ -175,9 +197,12 @@
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="logo-area">
+            <div class="logo-area" style="position: relative;">
                 <div class="logo-icon">M</div>
                 <h1>มานี บัญชี</h1>
+                <div id="trial-badge" style="display: none; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; font-weight: 600;">
+                    เหลือทดลองใช้ 30 วัน
+                </div>
             </div>
             <nav class="nav-menu">
                 <button class="nav-item active" data-tab="chat">
@@ -717,9 +742,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="db.js?v=12"></script>
+    <script src="db.js?v=13"></script>
     <script src="ai.js?v=13"></script>
-    <script src="app.js?v=42"></script>
+    <script src="app.js?v=43"></script>
     
     <script>
         if ('serviceWorker' in navigator) {

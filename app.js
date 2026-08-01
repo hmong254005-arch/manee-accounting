@@ -7,6 +7,83 @@ let products = [];
 let chartInstance = null;
 let chatHistory = [];
 
+// --- SaaS Enforcement ---
+async function enforceSaaS(user) {
+    if (!user) return;
+    
+    // 1. Initialize trial date if missing
+    if (!user.user_metadata || !user.user_metadata.trial_start_date) {
+        await window.dbAPI.updateProfile({ trial_start_date: new Date().toISOString() });
+        user = await window.dbAPI.getCurrentUser(); // Refresh user object
+    }
+    
+    // 2. Check status
+    const status = window.dbAPI.getSubscriptionStatus(user);
+    
+    // 3. Update Badge UI
+    const badge = document.getElementById('trial-badge');
+    if (badge) {
+        if (status.status === 'subscribed') {
+            badge.style.display = 'none';
+        } else if (status.status === 'trial') {
+            badge.style.display = 'block';
+            badge.innerText = `เหลือทดลองใช้ ${status.daysLeft} วัน`;
+            badge.style.background = '#f59e0b';
+        } else if (status.status === 'expired') {
+            badge.style.display = 'block';
+            badge.innerText = 'หมดเวลาทดลองใช้';
+            badge.style.background = '#ef4444';
+        }
+    }
+    
+    // 4. Enforce Lock
+    if (status.isExpired) {
+        // Show modal and hide close button
+        const subModal = document.getElementById('subscription-modal');
+        const closeBtn = document.getElementById('btn-close-sub-modal');
+        if (subModal) subModal.style.display = 'flex';
+        if (closeBtn) closeBtn.style.display = 'none'; // Force them to pay
+    }
+}
+
+// Setup Slip Upload Listeners
+function setupSaaSListeners() {
+    const btnSubmit = document.getElementById('btn-submit-slip');
+    const inputSlip = document.getElementById('slip-upload-input');
+    const closeBtn = document.getElementById('btn-close-sub-modal');
+    const subModal = document.getElementById('subscription-modal');
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            if (subModal) subModal.style.display = 'none';
+        });
+    }
+    
+    if (btnSubmit && inputSlip) {
+        btnSubmit.addEventListener('click', async () => {
+            const file = inputSlip.files[0];
+            if (!file) {
+                alert('กรุณาแนบรูปภาพสลิปโอนเงินก่อนครับ');
+                return;
+            }
+            
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'กำลังส่งข้อมูล...';
+            
+            try {
+                await window.dbAPI.uploadPaymentSlip(file, 199.00);
+                alert('ส่งสลิปเรียบร้อยแล้ว! กรุณารอแอดมินตรวจสอบและเปิดระบบให้ครับ');
+                // Could sign out or just wait
+            } catch (e) {
+                alert('เกิดข้อผิดพลาด: ' + e.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'แจ้งโอนเงิน';
+            }
+        });
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     // Setup UI Listeners safely
@@ -29,6 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await window.dbAPI.initDB();
         setupAuthUI(); // Wire up login buttons
+        setupSaaSListeners(); // Wire up slip upload
         
         const user = await window.dbAPI.getCurrentUser();
         if (user) {
@@ -55,6 +133,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         try {
                             await window.dbAPI.updateProfile({ store_name: storeName });
                             document.getElementById('store-setup-modal').style.display = 'none';
+                            // Check SaaS
+                            await enforceSaaS(user);
                             
                             // Load app data
                             await loadTransactions();
@@ -76,6 +156,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('store-setup-modal').style.display = 'none';
                 const titleEl = document.querySelector('.mobile-top-title');
                 if(titleEl) titleEl.innerText = user.user_metadata.store_name || "มานี บัญชี";
+                
+                // Check SaaS
+                await enforceSaaS(user);
                 
                 await loadTransactions();
                 await loadProducts();
@@ -152,6 +235,9 @@ function setupAuthUI() {
             authModal.style.display = 'none';
             const titleEl = document.querySelector('.mobile-top-title');
             if(titleEl) titleEl.innerText = user.user_metadata.store_name || "มานี บัญชี";
+            
+            // Check SaaS
+            await enforceSaaS(user);
             
             await loadTransactions();
             await loadProducts();

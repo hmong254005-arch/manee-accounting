@@ -262,7 +262,78 @@ async function clearAllData() {
     if (txError || prError) {
         throw new Error("Failed to clear data");
     }
-    return true;
+    return { success: true };
+}
+
+// --- SaaS / Subscription Operations ---
+
+function getSubscriptionStatus(user) {
+    if (!user || !user.user_metadata) return { isExpired: false, daysLeft: 30, status: 'active' };
+    
+    const trialStart = user.user_metadata.trial_start_date;
+    const subEnd = user.user_metadata.subscription_end_date;
+    const now = new Date();
+    
+    // If they have an active subscription
+    if (subEnd) {
+        const endDate = new Date(subEnd);
+        if (endDate > now) {
+            const diffTime = Math.abs(endDate - now);
+            const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return { isExpired: false, daysLeft: daysLeft, status: 'subscribed' };
+        }
+    }
+    
+    // Trial logic
+    if (trialStart) {
+        const start = new Date(trialStart);
+        const expireDate = new Date(start);
+        expireDate.setDate(expireDate.getDate() + 30);
+        
+        if (now > expireDate) {
+            return { isExpired: true, daysLeft: 0, status: 'expired' };
+        } else {
+            const diffTime = Math.abs(expireDate - now);
+            const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return { isExpired: false, daysLeft: daysLeft, status: 'trial' };
+        }
+    }
+    
+    // Default (new users before initialized)
+    return { isExpired: false, daysLeft: 30, status: 'trial' };
+}
+
+async function uploadPaymentSlip(file, amount) {
+    if (!currentUser) throw new Error("Please log in first");
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+    const filePath = `slips/${fileName}`;
+    
+    // 1. Upload file to Storage
+    const { error: uploadError, data: uploadData } = await supabaseClient.storage
+        .from('slips')
+        .upload(filePath, file);
+        
+    if (uploadError) throw uploadError;
+    
+    // Get public URL
+    const { data: { publicUrl } } = supabaseClient.storage
+        .from('slips')
+        .getPublicUrl(filePath);
+        
+    // 2. Insert record into payment_slips table
+    const { error: insertError } = await supabaseClient
+        .from('payment_slips')
+        .insert([{
+            user_id: currentUser.id,
+            slip_url: publicUrl,
+            amount: amount,
+            status: 'pending'
+        }]);
+        
+    if (insertError) throw insertError;
+    return { success: true, url: publicUrl };
 }
 
 // Ensure db is initialized before use
@@ -283,5 +354,7 @@ window.dbAPI = {
     updateProduct,
     getProducts,
     deleteProduct,
-    clearAllData
+    clearAllData,
+    getSubscriptionStatus,
+    uploadPaymentSlip
 };
