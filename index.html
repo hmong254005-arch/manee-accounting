@@ -59,7 +59,13 @@
                 <input type="text" id="auth-email" placeholder="example@email.com หรือ 0812345678" style="margin-bottom: 12px;" class="input-field">
                 
                 <label for="auth-password">รหัสผ่าน</label>
-                <input type="password" id="auth-password" placeholder="ตั้งรหัสผ่าน 6 ตัวขึ้นไป" style="margin-bottom: 20px;" class="input-field">
+                <input type="password" id="auth-password" placeholder="ตั้งรหัสผ่าน 6 ตัวขึ้นไป" style="margin-bottom: 8px;" class="input-field">
+                
+                <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px; margin-bottom: 20px;">
+                    <p style="color: #dc2626; font-size: 12px; margin: 0; line-height: 1.4;">
+                        <strong>⚠️ ข้อควรระวัง:</strong> กรุณาจำอีเมล/เบอร์โทร และรหัสผ่านของท่านให้ดี หากลืมรหัสผ่านและใช้อีเมลปลอม จะไม่สามารถกู้ข้อมูลบัญชีร้านค้าคืนได้
+                    </p>
+                </div>
                 
                 <button id="btn-login-submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
@@ -734,7 +740,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="db.js?v=13"></script>
     <script src="ai.js?v=13"></script>
-    <script src="app.js?v=44"></script>
+    <script src="app.js?v=45"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
