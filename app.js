@@ -264,45 +264,23 @@ function setupAuthUI() {
         });
     }
 
-    // LINE Login
-    const lineBtn = document.getElementById('btn-login-line');
-    if (lineBtn) {
-        lineBtn.addEventListener('click', async () => {
-            showLoading();
-            try {
-                await window.dbAPI.signInWithProvider('line');
-            } catch (e) {
-                hideLoading();
-                alert("เข้าสู่ระบบด้วย LINE ไม่สำเร็จ: " + e.message);
-            }
-        });
-    }
-
-    // Facebook Login
-    const fbBtn = document.getElementById('btn-login-facebook');
-    if (fbBtn) {
-        fbBtn.addEventListener('click', async () => {
-            showLoading();
-            try {
-                await window.dbAPI.signInWithProvider('facebook');
-            } catch (e) {
-                hideLoading();
-                alert("เข้าสู่ระบบด้วย Facebook ไม่สำเร็จ: " + e.message);
-            }
-        });
-    }
-    
-    // Email Login/Signup
+    // Email/Phone Login/Signup
     const loginSubmitBtn = document.getElementById('btn-login-submit') || document.getElementById('btn-email-login');
     if (loginSubmitBtn) {
         loginSubmitBtn.addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
+            let email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
             
             if (!email || !password) {
-            alert("กรุณากรอกอีเมลและรหัสผ่าน");
-            return;
-        }
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
+
+            // Phone Number to Email mapping
+            // If the user enters only digits (min 9 digits), treat it as a phone number
+            if (/^\d{9,15}$/.test(email)) {
+                email = `${email}@manee.app`;
+            }
         
         showLoading();
         try {
