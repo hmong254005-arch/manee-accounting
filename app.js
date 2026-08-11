@@ -113,12 +113,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Check if user has completed store onboarding
             if (!user.user_metadata || !user.user_metadata.store_name) {
                 // Show onboarding modal
+                document.getElementById('auth-modal').classList.remove('active');
                 document.getElementById('auth-modal').style.display = 'none';
-                document.getElementById('store-setup-modal').style.display = 'flex';
+                document.getElementById('store-setup-modal').classList.add('active');
                 
                 // Handle onboarding save
                 const saveBtn = document.getElementById('btn-save-store-name');
+                const cancelBtn = document.getElementById('btn-cancel-store-setup');
                 const storeInput = document.getElementById('setup-store-name');
+                
+                if (cancelBtn) {
+                    cancelBtn.onclick = async () => {
+                        cancelBtn.innerHTML = 'กำลังออกจากระบบ...';
+                        await window.dbAPI.signOut();
+                        window.location.reload();
+                    };
+                }
+
                 if (saveBtn && storeInput) {
                     saveBtn.onclick = async () => {
                         const storeName = storeInput.value.trim();
@@ -132,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         
                         try {
                             await window.dbAPI.updateProfile({ store_name: storeName });
-                            document.getElementById('store-setup-modal').style.display = 'none';
+                            document.getElementById('store-setup-modal').classList.remove('active');
                             // Check SaaS
                             await enforceSaaS(user);
                             
