@@ -1215,6 +1215,20 @@ async function loadProducts() {
         if (orderA !== orderB) return orderA - orderB;
         return (a.name || '').localeCompare(b.name || '');
     });
+
+    // Update Category Datalist with dynamic unique categories
+    const categoryOptions = document.getElementById('category-options');
+    if (categoryOptions) {
+        const uniqueCategories = [...new Set(products.map(p => p.category || 'ทั่วไป'))];
+        uniqueCategories.forEach(cat => {
+            if (!categoryOptions.querySelector(`option[value="${cat}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                categoryOptions.appendChild(opt);
+            }
+        });
+    }
+
     renderManageMenuTable();
     renderPOSGrid();
 }

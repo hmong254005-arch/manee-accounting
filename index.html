@@ -249,14 +249,7 @@
                     <label style="font-size: 14px; margin-top: 5px;">ราคา (บาท)</label>
                     <input type="number" id="edit-product-price" required>
                     <label style="font-size: 14px; margin-top: 5px;">หมวดหมู่</label>
-                    <select id="edit-product-category">
-                        <option value="กาแฟ">กาแฟ</option>
-                        <option value="ชา">ชา</option>
-                        <option value="นม/โกโก้">นม/โกโก้</option>
-                        <option value="อิตาเลียนโซดา">อิตาเลียนโซดา</option>
-                        <option value="ขนม/เบเกอรี่">ขนม/เบเกอรี่</option>
-                        <option value="อื่นๆ">อื่นๆ</option>
-                    </select>
+                    <input type="text" id="edit-product-category" list="category-options" class="input-field" placeholder="พิมพ์หรือเลือกหมวดหมู่" required>
                     <label style="font-size: 14px; margin-top: 5px;">สี</label>
                     <select id="edit-product-color">
                         <option value="var(--primary-color)">สีน้ำเงิน</option>
@@ -636,14 +629,7 @@
                 <div class="add-product-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
                     <input type="text" id="new-product-name" placeholder="ชื่อเมนู (เช่น ลาเต้เย็น)" required style="grid-column: span 2;">
                     <input type="number" id="new-product-price" placeholder="ราคา (บาท)" required>
-                    <select id="new-product-category">
-                        <option value="กาแฟ">กาแฟ</option>
-                        <option value="ชา">ชา</option>
-                        <option value="นม/โกโก้">นม/โกโก้</option>
-                        <option value="อิตาเลียนโซดา">อิตาเลียนโซดา</option>
-                        <option value="ขนม/เบเกอรี่">ขนม/เบเกอรี่</option>
-                        <option value="อื่นๆ">อื่นๆ</option>
-                    </select>
+                    <input type="text" id="new-product-category" list="category-options" class="input-field" placeholder="พิมพ์หรือเลือกหมวดหมู่ (เช่น ของทอด, เครื่องดื่ม)" required>
                     <select id="new-product-color">
                         <option value="var(--primary-color)">สีน้ำเงิน</option>
                         <option value="var(--success-color)">สีเขียว</option>
@@ -739,11 +725,24 @@
     <!-- Notification Toast -->
     <div id="toast" class="toast"></div>
 
+    <datalist id="category-options">
+        <option value="กับข้าว/อาหาร">
+        <option value="อาหารจานเดียว">
+        <option value="ไก่ทอด/ของทอด">
+        <option value="เครื่องดื่ม/กาแฟ">
+        <option value="ขนม/เบเกอรี่">
+        <option value="เสื้อผ้า/แฟชั่น">
+        <option value="เครื่องสำอาง/ความงาม">
+        <option value="ของใช้ในบ้าน">
+        <option value="บริการ">
+        <option value="ทั่วไป">
+    </datalist>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="db.js?v=13"></script>
     <script src="ai.js?v=13"></script>
-    <script src="app.js?v=46"></script>
+    <script src="app.js?v=47"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
