@@ -486,6 +486,10 @@ body {
 #view-chat {
     height: 100%;
 }
+#view-chat.active {
+    display: flex;
+    flex-direction: column;
+}
 #view-chat .view-header {
     display: none;
 }
@@ -1317,16 +1321,8 @@ tr:last-child td {
 .gemini-wrapper {
     background: transparent !important;
     border-top: none !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
     padding: 0;
-    pointer-events: none;
     z-index: 100;
-}
-.gemini-wrapper > * {
-    pointer-events: auto;
 }
 .line-style-container {
     background: #ffffff;
@@ -1340,6 +1336,8 @@ tr:last-child td {
 @media (min-width: 769px) {
     .gemini-wrapper {
         padding: 10px 15px 15px 15px;
+        position: relative; /* In flex flow */
+        width: 100%;
     }
     .gemini-wrapper > * {
         max-width: 600px;
@@ -1350,6 +1348,18 @@ tr:last-child td {
         border-radius: 32px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         border: 1px solid #e5e5e5;
+    }
+}
+@media (max-width: 768px) {
+    .gemini-wrapper {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        pointer-events: none;
+    }
+    .gemini-wrapper > * {
+        pointer-events: auto;
     }
 }
 .line-left-actions {
