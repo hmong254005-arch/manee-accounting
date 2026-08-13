@@ -111,6 +111,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAuthUI(); // Wire up login buttons
         setupSaaSListeners(); // Wire up slip upload
         
+        // --- Setup Store Onboarding Listeners Unconditionally ---
+        const saveBtn = document.getElementById('btn-save-store-name');
+        const cancelBtn = document.getElementById('btn-cancel-store-setup');
+        const storeInput = document.getElementById('setup-store-name');
+        
+        if (cancelBtn) {
+            cancelBtn.onclick = async () => {
+                cancelBtn.innerHTML = 'กำลังออกจากระบบ...';
+                await window.dbAPI.signOut();
+                window.location.reload();
+            };
+        }
+
+        if (saveBtn && storeInput) {
+            saveBtn.onclick = async () => {
+                const storeName = storeInput.value.trim();
+                if (!storeName) {
+                    alert('กรุณากรอกชื่อร้านค้าครับ');
+                    return;
+                }
+                
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = 'กำลังบันทึก...';
+                
+                try {
+                    await window.dbAPI.updateProfile({ store_name: storeName });
+                    document.getElementById('store-setup-modal').classList.remove('active');
+                    
+                    const currentUser = await window.dbAPI.getCurrentUser();
+                    // Check SaaS
+                    await enforceSaaS(currentUser);
+                    
+                    const titleEl = document.querySelector('.mobile-top-title');
+                    if(titleEl) titleEl.innerText = storeName;
+                    
+                    // Load app data
+                    await loadTransactions();
+                    await loadProducts();
+                    setupPOSDailySummary();
+                    generateInsight();
+                    showToast("บันทึกข้อมูลเรียบร้อย เข้าสู่ระบบสำเร็จ!");
+                } catch (err) {
+                    console.error(err);
+                    alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = 'บันทึกและเริ่มต้นใช้งาน';
+                }
+            };
+        }
+        // --------------------------------------------------------
+
         const user = await window.dbAPI.getCurrentUser();
         if (user) {
             // Check if user has completed store onboarding
@@ -119,51 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('auth-modal').classList.remove('active');
                 document.getElementById('auth-modal').style.display = 'none';
                 document.getElementById('store-setup-modal').classList.add('active');
-                
-                // Handle onboarding save
-                const saveBtn = document.getElementById('btn-save-store-name');
-                const cancelBtn = document.getElementById('btn-cancel-store-setup');
-                const storeInput = document.getElementById('setup-store-name');
-                
-                if (cancelBtn) {
-                    cancelBtn.onclick = async () => {
-                        cancelBtn.innerHTML = 'กำลังออกจากระบบ...';
-                        await window.dbAPI.signOut();
-                        window.location.reload();
-                    };
-                }
-
-                if (saveBtn && storeInput) {
-                    saveBtn.onclick = async () => {
-                        const storeName = storeInput.value.trim();
-                        if (!storeName) {
-                            alert('กรุณากรอกชื่อร้านค้าครับ');
-                            return;
-                        }
-                        
-                        saveBtn.disabled = true;
-                        saveBtn.innerHTML = 'กำลังบันทึก...';
-                        
-                        try {
-                            await window.dbAPI.updateProfile({ store_name: storeName });
-                            document.getElementById('store-setup-modal').classList.remove('active');
-                            // Check SaaS
-                            await enforceSaaS(user);
-                            
-                            // Load app data
-                            await loadTransactions();
-                            await loadProducts();
-                            setupPOSDailySummary();
-                            generateInsight();
-                            showToast("บันทึกข้อมูลเรียบร้อย เข้าสู่ระบบสำเร็จ!");
-                        } catch (err) {
-                            console.error(err);
-                            alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
-                            saveBtn.disabled = false;
-                            saveBtn.innerHTML = 'บันทึกและเริ่มต้นใช้งาน';
-                        }
-                    };
-                }
             } else {
                 // Already has store name, login normally
                 document.getElementById('auth-modal').style.display = 'none';
