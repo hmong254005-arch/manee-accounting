@@ -137,7 +137,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 try {
                     await window.dbAPI.updateProfile({ store_name: storeName });
-                    document.getElementById('store-setup-modal').classList.remove('active');
+                    const setupModal = document.getElementById('store-setup-modal');
+                    setupModal.classList.remove('active');
+                    setupModal.style.display = 'none';
                     
                     const currentUser = await window.dbAPI.getCurrentUser();
                     // Check SaaS
@@ -247,7 +249,9 @@ function setupAuthUI() {
         if (!user.user_metadata || !user.user_metadata.store_name) {
             // Show onboarding
             authModal.style.display = 'none';
-            document.getElementById('store-setup-modal').style.display = 'flex';
+            const setupModal = document.getElementById('store-setup-modal');
+            setupModal.style.display = '';
+            setupModal.classList.add('active');
             
             // Note: The click handler for saving store_name is already set up in DOMContentLoaded init block above.
         } else {

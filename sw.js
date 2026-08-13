@@ -1,9 +1,9 @@
-const CACHE_NAME = 'manee-cache-v71';
+const CACHE_NAME = 'manee-cache-v72';
 const urlsToCache = [
   './',
   './index.html',
   './style.css?v=32',
-  './app.js?v=51',
+  './app.js?v=52',
   './db.js?v=14',
   './ai.js?v=15',
   './manifest.json',
