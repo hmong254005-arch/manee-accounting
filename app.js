@@ -1,7 +1,10 @@
 // app.js - Main Application Logic
 
-let defaultApiKey = ''; // ต้องตั้งค่าในแอป
-let apiKey = localStorage.getItem('manee_api_key') || defaultApiKey;
+// === API Key Management (Centralized SaaS Model) ===
+// เถ้าแก่นำ API Key ของตัวเองมาใส่ในตัวแปรนี้ได้เลยครับ (แนะนำให้ใช้คีย์ฟรี เพื่อป้องกันค่าใช้จ่าย)
+const CENTRAL_API_KEY = ''; // <-- ใส่ API Key ที่นี่
+
+let apiKey = CENTRAL_API_KEY;
 let transactions = [];
 let products = [];
 let chartInstance = null;
@@ -411,15 +414,7 @@ function setupSettings() {
     const saveBtn = document.getElementById('save-settings-btn');
     const keyInput = document.getElementById('gemini-api-key');
 
-    if (!modal || !keyInput) return;
-
-    // Load saved key
-    if (apiKey) keyInput.value = apiKey;
-
-    // Show modal if no key on first load
-    if (!apiKey) {
-        modal.classList.add('active');
-    }
+    if (!modal) return;
 
     if (openBtn) {
         openBtn.addEventListener('click', () => {
@@ -434,20 +429,6 @@ function setupSettings() {
         });
     }
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
-            const key = keyInput.value.trim();
-            if (key) {
-                apiKey = key;
-                localStorage.setItem('manee_api_key', key);
-                modal.classList.remove('active');
-                if (typeof addChatMessage === 'function') addChatMessage("ระบบ", "บันทึก API Key เรียบร้อยแล้ว พร้อมใช้งานค่ะ!", "ai");
-            } else {
-                alert("กรุณาใส่ API Key");
-            }
-        });
-    }
 
     // Logout Logic
     const logoutBtn = document.getElementById('btn-logout');
@@ -1135,7 +1116,7 @@ async function generateInsight() {
     if (!insightBox) return;
 
     if (!apiKey || apiKey === '') {
-        insightBox.innerHTML = '<p class="insight-placeholder">กรุณาตั้งค่า API Key เพื่อดูคำแนะนำ</p>';
+        insightBox.innerHTML = '<p class="insight-placeholder">ระบบกำลังเตรียม AI หรือ API Key ส่วนกลางยังไม่พร้อมใช้งาน กรุณาติดต่อแอดมินค่ะ</p>';
         return;
     }
 
@@ -1776,7 +1757,7 @@ async function handleCloseShop() {
     
     // Get AI Insight
     if (!apiKey || apiKey === '') {
-        insightBox.innerHTML = '<p class="insight-placeholder">กรุณาตั้งค่า API Key เพื่อดูคำแนะนำจาก AI</p>';
+        insightBox.innerHTML = '<p class="insight-placeholder">ระบบกำลังเตรียม AI หรือ API Key ส่วนกลางยังไม่พร้อมใช้งาน กรุณาติดต่อแอดมินค่ะ</p>';
         return;
     }
 

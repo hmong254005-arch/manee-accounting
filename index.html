@@ -111,13 +111,11 @@
         <div class="modal-content">
             <button class="close-modal-btn" id="close-modal-btn">&times;</button>
             <h2 style="margin-bottom: 20px;">ตั้งค่าระบบ</h2>
-            <div class="form-group">
-                <label for="gemini-api-key">Gemini API Key</label>
+            <div style="display: none;">
+                <!-- API Key is now centralized, so this input is hidden -->
                 <input type="password" id="gemini-api-key" placeholder="ใส่ API Key ของคุณที่นี่">
-                <small>API Key ของคุณจะถูกเก็บไว้อย่างปลอดภัยในเบราว์เซอร์ของคุณเท่านั้น</small>
+                <button id="save-settings-btn" class="btn btn-primary" style="margin-bottom: 24px;">บันทึก API Key</button>
             </div>
-            <button id="save-settings-btn" class="btn btn-primary" style="margin-bottom: 24px;">บันทึก API Key</button>
-            
             <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 24px;">
             
             <h3 style="margin-bottom: 16px; font-size: 16px;">บัญชีผู้ใช้ (Account)</h3>
@@ -232,7 +230,7 @@
             <div class="sidebar-bottom">
                 <button id="open-settings-btn" class="nav-item">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    ตั้งค่า API
+                    ตั้งค่า (Settings)
                 </button>
             </div>
         </aside>
@@ -289,7 +287,7 @@
                     <div class="chat-messages" id="chat-messages">
                         <div class="message ai">
                             <div class="message-content">
-                                สวัสดีค่ะ เถ้าแก่! วันนี้มีอะไรให้มานีช่วยจดบัญชี หรืออยากสอบถามยอดขาย พิมพ์บอกมานีได้เลยนะคะ 😊 (อย่าลืมตั้งค่า API Key ก่อนนะ)
+                                สวัสดีค่ะ เถ้าแก่! วันนี้มีอะไรให้มานีช่วยจดบัญชี หรืออยากสอบถามยอดขาย พิมพ์บอกมานีได้เลยนะคะ 😊
                             </div>
                         </div>
                     </div>
@@ -740,9 +738,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script src="db.js?v=13"></script>
-    <script src="ai.js?v=14"></script>
-    <script src="app.js?v=49"></script>
+    <script src="db.js?v=14"></script>
+    <script src="ai.js?v=15"></script>
+    <script src="app.js?v=50"></script>
     
     <script>
         if ('serviceWorker' in navigator) {
