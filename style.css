@@ -1,25 +1,65 @@
 :root {
+    /* Light Theme (Default Aurora) */
     --bg-color: #f8fafc;
-    --sidebar-bg: rgba(255, 255, 255, 0.5);
-    --card-bg: rgba(255, 255, 255, 0.65);
+    --sidebar-bg: rgba(255, 255, 255, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.7);
     --text-primary: #1e293b;
     --text-secondary: #64748b;
-    --primary-color: #6366f1;
-    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
-    --primary-hover: #4f46e5;
-    --border-color: rgba(255, 255, 255, 0.6);
+    --primary-color: #8b5cf6;
+    --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    --primary-hover: #7c3aed;
+    --border-color: rgba(255, 255, 255, 0.8);
     --profit-color: #059669;
     --expense-color: #e11d48;
     --income-color: #0ea5e9;
     --success-color: #10b981;
     --warning-color: #f59e0b;
     --danger-color: #ef4444;
-    --ai-bg: rgba(255, 255, 255, 0.7);
+    --ai-bg: rgba(255, 255, 255, 0.8);
     --user-bg: var(--primary-gradient);
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
     --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.8);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.9);
+    
+    --body-bg-color: #f3e8ff;
+    --body-bg-image: 
+        radial-gradient(at 8% 7%, hsla(243,96%,86%,1) 0px, transparent 50%),
+        radial-gradient(at 93% 9%, hsla(305,98%,85%,1) 0px, transparent 50%),
+        radial-gradient(at 10% 89%, hsla(190,98%,85%,1) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, hsla(38,100%,84%,1) 0px, transparent 50%);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme (Night Aurora) */
+    --bg-color: #0f172a;
+    --sidebar-bg: rgba(15, 23, 42, 0.6);
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --primary-color: #a78bfa;
+    --primary-gradient: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+    --primary-hover: #c4b5fd;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --profit-color: #34d399;
+    --expense-color: #fb7185;
+    --income-color: #38bdf8;
+    --success-color: #34d399;
+    --warning-color: #fbbf24;
+    --danger-color: #f87171;
+    --ai-bg: rgba(30, 41, 59, 0.8);
+    --user-bg: var(--primary-gradient);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    --body-bg-color: #0b0f19;
+    --body-bg-image: 
+        radial-gradient(at 10% 20%, hsla(260, 80%, 20%, 1) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, hsla(320, 80%, 20%, 1) 0px, transparent 50%),
+        radial-gradient(at 20% 80%, hsla(200, 80%, 20%, 1) 0px, transparent 50%),
+        radial-gradient(at 80% 90%, hsla(300, 80%, 20%, 1) 0px, transparent 50%);
 }
 
 * {
@@ -30,18 +70,14 @@
 
 body {
     font-family: 'Sarabun', 'Inter', sans-serif;
-    /* Beautiful Vibrant Mesh Gradient */
-    background-color: #e0c3fc;
-    background-image: 
-        radial-gradient(at 8% 7%, hsla(243,96%,76%,1) 0px, transparent 50%),
-        radial-gradient(at 93% 9%, hsla(305,98%,75%,1) 0px, transparent 50%),
-        radial-gradient(at 10% 89%, hsla(190,98%,75%,1) 0px, transparent 50%),
-        radial-gradient(at 85% 85%, hsla(38,100%,74%,1) 0px, transparent 50%);
+    background-color: var(--body-bg-color);
+    background-image: var(--body-bg-image);
     background-attachment: fixed;
     color: var(--text-primary);
     line-height: 1.5;
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Modal */
@@ -359,30 +395,22 @@ body {
     opacity: 0.8;
 }
 
-/* Specific Card Gradients & Colors */
-.net-card {
-    background: linear-gradient(135deg, rgba(224, 231, 255, 0.7) 0%, rgba(199, 210, 254, 0.7) 100%);
-}
-.net-card .card-icon { color: #4338ca; }
-.net-card .amount { color: #3730a3; }
+/* Specific Card Colors for Icons & Accents */
+.net-card { border-top: 3px solid #8b5cf6; background: var(--card-bg); }
+.net-card .card-icon { color: #8b5cf6; background: rgba(139, 92, 246, 0.15); }
+.net-card .amount { color: var(--text-primary); }
 
-.profit-card {
-    background: linear-gradient(135deg, rgba(220, 252, 231, 0.7) 0%, rgba(187, 247, 208, 0.7) 100%);
-}
-.profit-card .card-icon { color: #15803d; }
-.profit-card .amount { color: #166534; }
+.profit-card { border-top: 3px solid #10b981; background: var(--card-bg); }
+.profit-card .card-icon { color: #10b981; background: rgba(16, 185, 129, 0.15); }
+.profit-card .amount { color: var(--text-primary); }
 
-.store-income-card {
-    background: linear-gradient(135deg, rgba(254, 240, 138, 0.7) 0%, rgba(253, 224, 71, 0.7) 100%);
-}
-.store-income-card .card-icon { color: #a16207; }
-.store-income-card .amount { color: #854d0e; }
+.store-income-card { border-top: 3px solid #0ea5e9; background: var(--card-bg); }
+.store-income-card .card-icon { color: #0ea5e9; background: rgba(14, 165, 233, 0.15); }
+.store-income-card .amount { color: var(--text-primary); }
 
-.expense-card {
-    background: linear-gradient(135deg, rgba(254, 226, 226, 0.7) 0%, rgba(254, 202, 202, 0.7) 100%);
-}
-.expense-card .card-icon { color: #b91c1c; }
-.expense-card .amount { color: #991b1b; }
+.expense-card { border-top: 3px solid #f43f5e; background: var(--card-bg); }
+.expense-card .card-icon { color: #f43f5e; background: rgba(244, 63, 94, 0.15); }
+.expense-card .amount { color: var(--text-primary); }
 
 @media(max-width: 480px) {
     .dashboard-grid {
@@ -533,14 +561,15 @@ body {
     background-color: var(--ai-bg);
     color: var(--text-primary);
     border-bottom-left-radius: 4px;
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow-sm);
 }
 
-.chat-message.user {
-    align-self: flex-end;
-    background: var(--primary-gradient);
+.message.user .message-content {
+    background: var(--user-bg);
     color: white;
     border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
 }
 
 /* Chat Markdown Table Styling */
@@ -787,10 +816,10 @@ tr:last-child td {
 }
 
 .pos-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 16px;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
     padding: 15px 12px;
     font-family: inherit;
     cursor: pointer;
@@ -799,24 +828,26 @@ tr:last-child td {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
     aspect-ratio: 1;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(12px);
 }
 
 .pos-btn::after {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
     pointer-events: none;
 }
 
 .pos-btn:hover {
     transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    border-color: var(--primary-color);
 }
 
 .pos-btn:active {
@@ -825,17 +856,18 @@ tr:last-child td {
 }
 
 .pos-price {
-    font-size: 10px;
-    opacity: 0.9;
-    font-weight: normal;
+    font-size: 11px;
+    opacity: 0.8;
+    font-weight: 500;
 }
 
 .pos-stats-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--card-bg);
+    border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
+    backdrop-filter: blur(16px);
 }
 
 .pos-stats-list {

@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     safeSetup('setupNavigation', setupNavigation);
+    safeSetup('setupTheme', setupTheme);
     safeSetup('setupSettings', setupSettings);
     safeSetup('setupChat', setupChat);
     safeSetup('setupTransactionsTable', setupTransactionsTable);
@@ -334,6 +335,58 @@ function setupAuthUI() {
     }
 }
 
+  // --- Theme Management ---
+function setupTheme() {
+    const savedTheme = localStorage.getItem('manee_theme') || 'light';
+    applyTheme(savedTheme);
+
+    const toggleDesktop = document.getElementById('theme-toggle-desktop');
+    const toggleMobile = document.getElementById('theme-toggle-mobile');
+
+    const toggleHandler = () => {
+        const currentTheme = document.body.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        applyTheme(newTheme);
+    };
+
+    if (toggleDesktop) toggleDesktop.addEventListener('click', toggleHandler);
+    if (toggleMobile) toggleMobile.addEventListener('click', toggleHandler);
+}
+
+function applyTheme(theme) {
+    document.body.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
+    localStorage.setItem('manee_theme', theme);
+    
+    // Update icons
+    const updateIcons = (btnId) => {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        const moon = btn.querySelector('.moon-icon');
+        const sun = btn.querySelector('.sun-icon');
+        const text = btn.querySelector('.theme-text');
+        if (theme === 'dark') {
+            if (moon) moon.style.display = 'none';
+            if (sun) sun.style.display = 'block';
+            if (text) text.innerText = 'โหมดสว่าง (Light)';
+        } else {
+            if (moon) moon.style.display = 'block';
+            if (sun) sun.style.display = 'none';
+            if (text) text.innerText = 'โหมดกลางคืน (Dark)';
+        }
+    };
+    updateIcons('theme-toggle-desktop');
+    updateIcons('theme-toggle-mobile');
+
+    // Update Chart Defaults
+    if (window.Chart) {
+        Chart.defaults.color = theme === 'dark' ? '#f8fafc' : '#334155';
+        if (chartInstance) {
+            chartInstance.update();
+        }
+    }
+}
+
+// Setup Navigation
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-menu .nav-item');
     const views = document.querySelectorAll('.view-section');
